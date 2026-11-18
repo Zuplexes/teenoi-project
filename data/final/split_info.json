@@ -1,0 +1,18 @@
+{
+  "labels": [
+    "none",
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "aspects": {
+    "food": "อาหาร",
+    "service": "บริการ",
+    "environment": "บรรยากาศ",
+    "waiting": "เวลาในการรอ",
+    "cleanliness": "ความสะอาด"
+  },
+  "teenoi_data_version": "0.1.0",
+  "conflict_strategy": "majority",
+  "seed": 42
+}
