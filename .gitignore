@@ -1,0 +1,9 @@
+# ไฟล์ที่ไม่เอาขึ้น git (.venv/ มี .gitignore ของตัวเองอยู่แล้ว)
+# หมายเหตุ: .gitignore ใส่ comment ท้ายบรรทัดไม่ได้ ต้องขึ้นบรรทัดใหม่ด้วย #
+
+# โมเดลและ checkpoint ไฟล์ใหญ่ระดับ GB
+models/
+# log การรัน สร้างใหม่ได้
+logs/
+# cache ของ Python
+__pycache__/

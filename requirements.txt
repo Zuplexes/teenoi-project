@@ -1,0 +1,9 @@
+# ติดตั้ง torch แบบ CUDA แยกก่อน (ให้ใช้ GPU ได้):
+#   pip install torch --index-url https://download.pytorch.org/whl/cu134   (ไดรเวอร์ CUDA 13.4)
+# แล้วค่อย: pip install -r requirements.txt
+transformers>=4.46   # โมเดลและ Trainer ของ Hugging Face
+accelerate>=0.26     # Trainer ต้องใช้ จัดการ GPU / fp16
+sentencepiece        # tokenizer ของ xlm-roberta
+scikit-learn         # แบ่งข้อมูล (StratifiedGroupKFold) และคำนวณคะแนน
+pyyaml               # อ่านไฟล์ config .yml
+matplotlib           # วาดกราฟรายงาน
