@@ -50,6 +50,13 @@ python main.py      # ได้ data/clean/reviews_clean.csv
 ## Label Studio
 
 สร้างโปรเจกต์ → Labeling Interface → Code → วางเนื้อหาจาก `labelstudio_config.xml` → import `data/clean/reviews_clean.csv`
+หรือ upload อัตโนมัติ: ตั้งค่าใน `configs/labelstudio.yml` แล้ว
+
+```bash
+# ใส่ Access Token (Account & Settings) ในไฟล์ .env: LABEL_STUDIO_API_KEY=xxxx
+python upload_labelstudio.py   # สร้างโปรเจกต์ให้ถ้ายังไม่มี, รีวิวที่ upload แล้วจะไม่ถูกส่งซ้ำ
+```
+
 แนะนำ export ผล label เป็น **JSON** (เชื่อม span กับ sentiment ได้ครบ)
 
 ## ขั้นตอน clean
