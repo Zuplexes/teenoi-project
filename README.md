@@ -20,6 +20,7 @@ teenoi-train/
 ├── fetch.py                 # 0) ดึงไฟล์ export จาก Label Studio (โปรเจกต์ teenoi-*)
 ├── split.py                 # 1) แปลงไฟล์ Label Studio -> train/val/test
 ├── train.py                 # 2) เทรนโมเดล + วัดผล test + สร้างรายงาน
+├── baseline.py              # 3) baseline Naive Bayes เทียบกับ xlm-roberta -> reports/baseline/naive_bayes/
 ├── plot.py                  # วาดกราฟรายงาน (train.py เรียกใช้ / รันเองเพื่อวาดใหม่ได้)
 ├── requirements.txt         # ไลบรารีที่ต้องติดตั้ง
 ├── configs/
