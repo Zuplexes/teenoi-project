@@ -7,3 +7,5 @@ models/
 logs/
 # cache ของ Python
 __pycache__/
+# token / รหัสลับ
+.env

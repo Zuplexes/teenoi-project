@@ -17,11 +17,13 @@
 
 ```
 teenoi-train/
+├── fetch.py                 # 0) ดึงไฟล์ export จาก Label Studio (โปรเจกต์ teenoi-*)
 ├── split.py                 # 1) แปลงไฟล์ Label Studio -> train/val/test
 ├── train.py                 # 2) เทรนโมเดล + วัดผล test + สร้างรายงาน
 ├── plot.py                  # วาดกราฟรายงาน (train.py เรียกใช้ / รันเองเพื่อวาดใหม่ได้)
 ├── requirements.txt         # ไลบรารีที่ต้องติดตั้ง
 ├── configs/
+│   ├── labelstudio_config.yml # ค่าของ fetch.py (url, prefix ชื่อโปรเจกต์)
 │   ├── split_config.yml     # ค่าของ split.py
 │   └── train_config.yml     # ค่าของ train.py
 ├── dataset/
@@ -60,14 +62,22 @@ python -c "import torch; print(torch.cuda.is_available())"   # ต้องไ�
 
 ## 2. เตรียมข้อมูล
 
-1. ใน Label Studio เลือกโปรเจกต์ → **Export** → **JSON**
-2. วางไฟล์ทั้งหมดไว้ใน `dataset/label/` (กี่ไฟล์ก็ได้ ถ้ารีวิวซ้ำกันข้ามไฟล์จะใช้อันแรกที่เจอ)
+ดึงอัตโนมัติทุกโปรเจกต์ที่ชื่อขึ้นต้นด้วย `teenoi-` (ตั้งค่าใน `configs/labelstudio_config.yml`):
+
+```powershell
+# ใส่ token ในไฟล์ .env (ไม่ขึ้น git): LABEL_STUDIO_TOKEN=<token>
+# หา token: Label Studio > Account & Settings > Personal Access Token
+python fetch.py                        # ได้ dataset/label/<ชื่อโปรเจกต์>-<id>.json รันซ้ำ = เขียนทับไฟล์เดิม
+```
+
+หรือทำมือ: ในโปรเจกต์ → **Export** → **JSON** แล้ววางไว้ใน `dataset/label/`
+(ถ้ารีวิวซ้ำกันข้ามไฟล์จะใช้อันแรกที่เจอ ตามลำดับชื่อไฟล์ จึงอย่าเก็บไฟล์ export เก่าของโปรเจกต์เดียวกันไว้)
 
 รูปแบบ labeling ใน Label Studio ที่สคริปต์รองรับ:
 - ลากเลือกข้อความแล้วติดป้าย **ด้าน** (เช่น `อาหาร (Food)`)
 - แล้วเลือก **sentiment** ของ span นั้น (เช่น `ดี (Positive)`)
 - ชื่อด้าน/sentiment ต้องตรงกับใน `configs/split_config.yml` ถ้าเจอชื่อที่ไม่รู้จักสคริปต์จะหยุดและบอกว่าต้องเพิ่มอะไร
-- เจอ label ผิด → แก้ใน Label Studio แล้ว export ใหม่มาทับไฟล์เดิมใน `dataset/label/`
+- เจอ label ผิด → แก้ใน Label Studio แล้วรัน `python fetch.py` ใหม่
 
 ---
 
@@ -176,7 +186,7 @@ python plot.py reports/teenoi_1/xlm-roberta-base reports/teenoi_2/xlm-roberta-ba
 
 ```powershell
 .venv\Scripts\activate
-# (ถ้ามี label ใหม่) วางไฟล์ export ใน dataset/label/
+python fetch.py   # ดึง label ล่าสุดจาก Label Studio (ต้องใส่ token ใน .env ก่อน)
 python split.py
 # แก้ configs/train_config.yml: output_dir / report_dir = ชื่อรอบใหม่
 python train.py
