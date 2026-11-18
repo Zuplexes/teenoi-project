@@ -1,0 +1,10 @@
+gmaps_profile/
+data/
+model/
+models/
+logs/
+reports/
+__pycache__/
+*.egg-info/
+.ipynb_checkpoints/
+.venv/
