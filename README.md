@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # teenoi-data
 
 ดึงรีวิวร้านสุกี้ตี๋น้อยจาก Google Maps แล้ว clean ให้พร้อม import เข้า Label Studio ในคำสั่งเดียว
@@ -86,3 +87,6 @@ python tests/test_split.py
 - `data/` มีข้อความรีวิวที่ดึงมาจาก Google Maps จึงไม่ commit ขึ้น repo
 - `chrome_profile/` (ตาม `browser.profile_dir`) มี session ที่ล็อกอินอยู่ ห้าม commit หรือแชร์
 - Google เปลี่ยน class name บ่อย ถ้าดึงได้ 0 รีวิวให้แก้ dict `SEL` ใน `src/teenoi_data/scraper.py`
+=======
+# DataPulling
+>>>>>>> ce5b2375a545a8d1859e0506d90e574e0ee51eb2
