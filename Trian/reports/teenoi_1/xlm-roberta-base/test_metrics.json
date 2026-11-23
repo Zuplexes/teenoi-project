@@ -1,0 +1,104 @@
+{
+  "overall": {
+    "n": 1467,
+    "accuracy": 0.8753,
+    "f1_macro": 0.6935,
+    "f1": {
+      "none": 0.931,
+      "negative": 0.7479,
+      "neutral": 0.2432,
+      "positive": 0.8518
+    },
+    "support": {
+      "none": 964,
+      "negative": 173,
+      "neutral": 34,
+      "positive": 296
+    }
+  },
+  "food": {
+    "n": 295,
+    "accuracy": 0.8814,
+    "f1_macro": 0.7491,
+    "f1": {
+      "none": 0.9268,
+      "negative": 0.7636,
+      "neutral": 0.4,
+      "positive": 0.9058
+    },
+    "support": {
+      "none": 143,
+      "negative": 28,
+      "neutral": 12,
+      "positive": 112
+    }
+  },
+  "service": {
+    "n": 293,
+    "accuracy": 0.8669,
+    "f1_macro": 0.6475,
+    "f1": {
+      "none": 0.8903,
+      "negative": 0.8224,
+      "neutral": 0.0,
+      "positive": 0.8774
+    },
+    "support": {
+      "none": 163,
+      "negative": 48,
+      "neutral": 4,
+      "positive": 78
+    }
+  },
+  "environment": {
+    "n": 288,
+    "accuracy": 0.809,
+    "f1_macro": 0.5553,
+    "f1": {
+      "none": 0.9035,
+      "negative": 0.597,
+      "neutral": 0.1053,
+      "positive": 0.6154
+    },
+    "support": {
+      "none": 212,
+      "negative": 34,
+      "neutral": 6,
+      "positive": 36
+    }
+  },
+  "waiting": {
+    "n": 293,
+    "accuracy": 0.843,
+    "f1_macro": 0.6879,
+    "f1": {
+      "none": 0.9181,
+      "negative": 0.7797,
+      "neutral": 0.25,
+      "positive": 0.8039
+    },
+    "support": {
+      "none": 177,
+      "negative": 55,
+      "neutral": 12,
+      "positive": 49
+    }
+  },
+  "cleanliness": {
+    "n": 298,
+    "accuracy": 0.9732,
+    "f1_macro": 0.8369,
+    "f1": {
+      "none": 0.987,
+      "negative": 0.5714,
+      "neutral": null,
+      "positive": 0.9524
+    },
+    "support": {
+      "none": 269,
+      "negative": 8,
+      "neutral": 0,
+      "positive": 21
+    }
+  }
+}

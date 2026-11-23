@@ -1,0 +1,28 @@
+# ค่าทั้งหมดที่ split.py ใช้ (รัน: python split.py)
+
+seed: 42                              # ล็อกการสุ่มแบ่งข้อมูล seed เดิม = ได้ train/val/test ชุดเดิมทุกครั้ง
+
+input_glob: dataset/label/*.json      # ไฟล์ JSON ที่ export จาก Label Studio (อ่านทุกไฟล์ในโฟลเดอร์)
+output_dir: data/final                # ที่เก็บผล: train.csv, val.csv, test.csv, split_info.json
+teenoi_data_version: "0.1.0"          # เวอร์ชันของ teenoi-data ที่ใช้ clean ข้อมูลชุดนี้ (บันทึกติดไปกับโมเดล)
+
+ratios: {train: 0.8, val: 0.1, test: 0.1}   # สัดส่วนจำนวนรีวิว (ได้ใกล้เคียง ไม่ตรงเป๊ะ) รีวิวเดียวกันอยู่ชุดเดียวเสมอ
+
+# รีวิวเดียวกัน ด้านเดียวกัน แต่ label หลาย span ที่ sentiment ต่างกัน (พบ 383 คู่) จะทำอย่างไร
+#   majority = ใช้เสียงข้างมาก ถ้าเสมอ -> ตัดทิ้ง (ความเห็นผสมไม่ใช่ neutral)
+#   drop     = ตัดทุกคู่ที่ขัดกันทิ้ง
+conflict_strategy: majority
+
+# ชื่อด้านใน Label Studio -> code = รหัสที่ใช้ในไฟล์/รายงาน, text = ข้อความที่ส่งให้โมเดลคู่กับรีวิว
+aspects:
+  "อาหาร (Food)":               {code: food,        text: "อาหาร"}
+  "บริการ (Service)":           {code: service,     text: "บริการ"}
+  "บรรยากาศ (Environment)":     {code: environment, text: "บรรยากาศ"}
+  "เวลาในการรอ (Waiting Time)": {code: waiting,     text: "เวลาในการรอ"}
+  "ความสะอาด (Cleanliness)":    {code: cleanliness, text: "ความสะอาด"}
+
+# ชื่อ sentiment ใน Label Studio -> label ที่ใช้เทรน (ด้านที่ไม่ถูก label = none)
+sentiments:
+  "แย่ (Negative)": negative
+  "เฉยๆ (Neutral)": neutral
+  "ดี (Positive)": positive
