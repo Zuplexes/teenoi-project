@@ -1,7 +1,0 @@
-# ค่าที่ fetch.py ใช้ดึงข้อมูลจาก Label Studio (รัน: python fetch.py)
-# token ไม่ใส่ในไฟล์นี้ (ไฟล์ขึ้น git) ให้ใส่ในไฟล์ .env ที่โฟลเดอร์โปรเจกต์: LABEL_STUDIO_TOKEN=<token>
-#   หา token: Label Studio > มุมขวาบน Account & Settings > Personal Access Token (หรือ Access Token)
-
-url: http://26.234.195.56:8080          # ที่อยู่ Label Studio
-project_prefix: "teenoi-"               # ดึงเฉพาะโปรเจกต์ที่ชื่อขึ้นต้นด้วยคำนี้
-output_dir: dataset/label               # ที่วางไฟล์ export (ต้องตรงกับ input_glob ใน split_config.yml)

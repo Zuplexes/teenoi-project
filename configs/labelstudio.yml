@@ -1,0 +1,16 @@
+# ตั้งค่า Label Studio ของ 2_upload_labelstudio.py (upload) และ 3_fetch_labels.py (fetch)
+# API key ไม่ใส่ในไฟล์นี้ (ขึ้น git) ให้ใส่ในไฟล์ .env ที่ root ของ repo (อยู่ใน .gitignore):
+#   LABEL_STUDIO_API_KEY=<key จาก Label Studio -> Account & Settings -> Personal Access Token หรือ Access Token>
+
+url: http://26.234.195.56:8080              # ที่อยู่ server (ไม่ต้องมี /user/login/)
+
+upload:                                      # ขั้นที่ 2: ส่งรีวิวที่ clean แล้วขึ้นไปให้คน label
+  project_title: teenoi-data                 # ชื่อโปรเจกต์ ถ้ายังไม่มีจะสร้างให้พร้อม label_config
+  label_config: configs/labelstudio_interface.xml  # Labeling Interface ที่ใช้ตอนสร้างโปรเจกต์ใหม่
+  files:                                     # ไฟล์ CSV ที่จะ upload (ต้องมีคอลัมน์ review_id, review)
+    - data/clean/reviews_clean.csv
+  batch_size: 500                            # จำนวนรีวิวต่อ 1 request
+
+fetch:                                       # ขั้นที่ 3: ดึงผล label กลับมาเทรน
+  project_prefix: "teenoi-"                  # ดึงเฉพาะโปรเจกต์ที่ชื่อขึ้นต้นด้วยคำนี้
+  output_dir: data/label                     # ที่วางไฟล์ export (ต้องตรงกับ input_glob ใน configs/split.yml)

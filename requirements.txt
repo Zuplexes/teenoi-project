@@ -1,0 +1,6 @@
+playwright     # คุม Google Chrome ดึงรีวิว (ต้องมี Google Chrome ในเครื่อง ไม่ต้อง playwright install)
+pandas         # อ่าน/เขียน CSV และจัดการตาราง
+pyyaml         # อ่านไฟล์ config .yml
+pythainlp      # normalize ข้อความภาษาไทย (cleaner)
+scikit-learn   # Naive Bayes / Logistic Regression / Linear SVM + แบ่งข้อมูล + คะแนน (มี joblib มาด้วย)
+matplotlib     # วาดกราฟรายงาน

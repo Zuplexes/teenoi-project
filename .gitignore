@@ -1,0 +1,18 @@
+# session Google ที่ล็อกอินไว้ (มี cookie บัญชี ห้าม commit เด็ดขาด)
+chrome_profile/
+# token / รหัสลับ (LABEL_STUDIO_API_KEY)
+.env
+# รีวิวที่ดึงจาก Google Maps + ฐานข้อมูลของ 6_predict.py (สร้างใหม่ได้ ไม่ขึ้น repo)
+data/raw/
+data/clean/
+data/predict/
+# โมเดลที่เทรนแล้ว (สร้างใหม่ได้ด้วย python 5_train.py)
+models/
+logs/
+# ไฟล์ที่ Python สร้างเอง
+__pycache__/
+.venv/
+# .git ของ 4 repo เดิม (สำรองไว้ ประวัติถูกรวมเข้า repo นี้แล้ว ลบทิ้งได้)
+_old_repos/
+# ค่าที่ Vercel CLI สร้างตอน link โปรเจกต์เว็บ
+web/.vercel/

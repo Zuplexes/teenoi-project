@@ -1,0 +1,14 @@
+# ค่าทั้งหมดที่ 5_train.py ใช้ (รัน: python 5_train.py)
+
+data_dir: data/final                  # ข้อมูลที่ได้จาก 4_split.py (train.csv, val.csv, test.csv, split_info.json)
+model_file: models/aspect_sentiment.joblib  # โมเดลที่เทรนได้ (6_predict.py ใช้ไฟล์นี้) เทรนใหม่ = เขียนทับ
+report_dir: reports                   # รายงาน + กราฟผล test
+
+# ---- feature: char n-gram (นับชิ้นตัวอักษรติดกัน ไม่ต้องตัดคำไทย) ----
+features:
+  ngram_range: [1, 4]                 # ความยาวชิ้นตัวอักษร 1 ถึง 4 ตัว
+  min_df: 2                           # ชิ้นที่เจอในรีวิวน้อยกว่า 2 รีวิวไม่นับ (ตัด noise/พิมพ์ผิด)
+
+# ---- Naive Bayes (MultinomialNB) ----
+alpha: 1.0                            # smoothing: น้อย = เชื่อข้อมูล train มาก, มาก = เกลี่ยให้เรียบ
+                                      # จะปรับค่า ให้ดู val f1_macro ใน log (อย่าดู test ตอนปรับ)
