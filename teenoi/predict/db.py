@@ -41,22 +41,22 @@ CREATE TABLE IF NOT EXISTS runs (
 BRANCH_COLS = ["name", "address", "lat", "lng", "gmaps_url", "google_rating", "review_count"]  # คอลัมน์ข้อมูลสาขาที่อัปเดตได้
 
 
-def now():
+def now():  # เวลาปัจจุบันแบบข้อความ
     """เวลาปัจจุบันแบบ ISO ละเอียดถึงวินาที เช่น 2026-11-18T10:00:00"""
-    return datetime.now().isoformat(timespec="seconds")
+    return datetime.now().isoformat(timespec="seconds")  # เช่น 2026-11-23T21:40:06
 
 
-def connect(path):
+def connect(path):  # เปิด/สร้างฐานข้อมูล
     """เปิดฐานข้อมูล (":memory:" = ในหน่วยความจำ ไว้ทดสอบ) และสร้างตารางที่ยังไม่มี"""
     if path != ":memory:":  # เป็นไฟล์จริง
         Path(path).parent.mkdir(parents=True, exist_ok=True)  # สร้างโฟลเดอร์ถ้ายังไม่มี
     conn = sqlite3.connect(path)  # เปิด/สร้างไฟล์ฐานข้อมูล
     conn.row_factory = sqlite3.Row  # ให้อ่านแถวด้วยชื่อคอลัมน์ได้ เช่น row["name"]
     conn.executescript(SCHEMA)  # สร้างตาราง (IF NOT EXISTS = ไม่ทับของเดิม)
-    return conn
+    return conn  # connection ที่พร้อมใช้
 
 
-def upsert_branch(conn, branch, **extra):
+def upsert_branch(conn, branch, **extra):  # เพิ่มหรืออัปเดตสาขา 1 สาขา
     """เพิ่มสาขาใหม่ หรืออัปเดตเฉพาะค่าที่ไม่ใช่ None ของสาขาเดิม (found_at เก็บครั้งแรกไว้)
     extra: คอลัมน์เพิ่มเติม เช่น found_at, last_scraped_at"""
     row = {**{col: branch.get(col) for col in BRANCH_COLS}, **extra}  # ค่าที่จะเขียน (ไม่มี = None)
@@ -64,30 +64,30 @@ def upsert_branch(conn, branch, **extra):
     updates = ", ".join(  # ส่วน SET ตอนสาขามีอยู่แล้ว
         "found_at = COALESCE(found_at, excluded.found_at)" if col == "found_at"  # found_at: เก็บค่าเดิมถ้ามี
         else f"{col} = COALESCE(excluded.{col}, {col})" for col in row)  # อื่นๆ: ใช้ค่าใหม่ ยกเว้นค่าใหม่เป็น None
-    conn.execute(
+    conn.execute(  # รัน SQL
         f"INSERT INTO branches ({', '.join(cols)}) VALUES ({', '.join('?' for _ in cols)}) "  # เพิ่มแถวใหม่
         f"ON CONFLICT(branch_id) DO UPDATE SET {updates}",  # ถ้า branch_id ซ้ำ ให้อัปเดตแทน
         [branch["branch_id"], *row.values()])  # ค่าที่ใส่แทน ?
 
 
-def last_success(conn, step):
+def last_success(conn, step):  # หาเวลาที่ขั้นนี้สำเร็จล่าสุด
     """เวลาจบล่าสุดที่ขั้น step รันสำเร็จ (None = ไม่เคย)"""
-    return conn.execute("SELECT MAX(finished_at) FROM runs WHERE step = ? AND status = 'ok'", (step,)).fetchone()[0]
+    return conn.execute("SELECT MAX(finished_at) FROM runs WHERE step = ? AND status = 'ok'", (step,)).fetchone()[0]  # ค่าแรกของแถวแรก (None = ไม่เคย)
 
 
-@contextmanager
-def run_step(conn, run_id, step):
+@contextmanager  # ทำให้ฟังก์ชันข้างล่างใช้กับ with ได้
+def run_step(conn, run_id, step):  # บันทึกประวัติการรันของ 1 ขั้น
     """บันทึกประวัติการรันแต่ละขั้นลงตาราง runs: running ตอนเริ่ม แล้วเป็น ok หรือ error ตอนจบ"""
-    rowid = conn.execute("INSERT INTO runs (run_id, started_at, step, status) VALUES (?, ?, ?, 'running')",
+    rowid = conn.execute("INSERT INTO runs (run_id, started_at, step, status) VALUES (?, ?, ?, 'running')",  # SQL เพิ่มแถวประวัติ
                          (run_id, now(), step)).lastrowid  # เพิ่มแถวสถานะ running แล้วจำ rowid ไว้อัปเดต
     conn.commit()  # บันทึกทันที (เห็นได้แม้โปรแกรมค้าง)
     status, message = "ok", None  # ค่าเริ่มต้น = สำเร็จ
-    try:
+    try:  # ลองทำงานใน with
         yield  # ทำงานของขั้นนั้น (โค้ดใน with-block)
     except BaseException as e:  # รวม Ctrl+C และ SystemExit
         status, message = "error", str(e) or type(e).__name__  # จำ error ไว้ (ไม่มีข้อความ ใช้ชื่อ error)
         raise  # ส่ง error ต่อ ไม่กลืนทิ้ง
     finally:  # ทำเสมอ ไม่ว่าสำเร็จหรือ error
-        conn.execute("UPDATE runs SET finished_at = ?, status = ?, message = ? WHERE rowid = ?",
+        conn.execute("UPDATE runs SET finished_at = ?, status = ?, message = ? WHERE rowid = ?",  # SQL อัปเดตแถวประวัติ
                      (now(), status, message, rowid))  # บันทึกเวลาจบและสถานะ
-        conn.commit()
+        conn.commit()  # บันทึกลงไฟล์ฐานข้อมูล

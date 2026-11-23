@@ -17,11 +17,11 @@ export const clean = s => s == null ? s : String(s) // null / undefined คื�
   .trim(); // ตัดช่องว่างหัวท้าย
 
 // แสดงข้อความสถานะใต้ช่องค้นหา (err = true → ตัวแดง)
-export const setMsg = (text, err = false) => {
+export const setMsg = (text, err = false) => {  // ฟังก์ชันแบบ arrow
   const el = document.getElementById('msg'); // กล่องข้อความสถานะ
   el.textContent = text; // ใส่ข้อความ (textContent ไม่ตีความ HTML จึงปลอดภัย)
   el.classList.toggle('err', err); // ใส่ / เอาออก สีแดง ตามสถานะ error
-};
+};  // จบ setMsg
 
 // ---------- ตัวเลขของแต่ละด้าน (a = { label, positive, neutral, negative }) ----------
 
@@ -33,12 +33,12 @@ const labelText = a => a.label === NODATA // ข้อความบนป้�
   : LABEL_TEXT[a.label] ?? a.label; // อื่นๆ → คำที่แปลงแล้ว (เฉยๆ → ปานกลาง) หรือคำเดิม
 
 // รายละเอียดจำนวนครั้ง เช่น "ลูกค้าพูดถึง 4 ครั้ง (บวก 4 · ลบ 0)"
-export function countText(a) {
+export function countText(a) {  // a = ผลของ 1 ด้าน
   const m = mentions(a); // จำนวนครั้งทั้งหมด
   if (!m) return 'ลูกค้ายังไม่ได้พูดถึง'; // 0 ครั้ง
   const neutral = a.neutral ? ` · กลาง ${a.neutral}` : ''; // แสดง "กลาง" เฉพาะเมื่อมี (โมเดลแทบไม่ทาย)
   return `ลูกค้าพูดถึง ${m} ครั้ง (บวก ${a.positive} · ลบ ${a.negative}${neutral})`; // ประกอบเป็นประโยค
-}
+}  // จบ countText
 
 // ---------- ภาพรวมทั้งเครือ ----------
 
@@ -50,18 +50,18 @@ export const verdict = (score, m, min) => // m = จำนวนครั้ง�
         : 'เฉยๆ'; // อยู่ระหว่างนั้น (เว็บแสดงเป็น "ปานกลาง")
 
 // รวมตัวเลขทุกสาขาเป็นภาพรวมทั้งเครือ ทุกด้าน (คำนวณจาก JSON ทุกครั้ง ไม่มีตัวเลขตายตัว)
-export function overall(branches, codes, min) {
+export function overall(branches, codes, min) {  // min = จำนวนครั้งขั้นต่ำ
   return Object.fromEntries(codes.map(k => { // ทำทีละด้าน แล้วรวมเป็น { food: {...}, service: {...}, ... }
     const a = { positive: 0, neutral: 0, negative: 0 }; // ตัวนับเริ่มที่ 0
     for (const b of branches) { // วนทุกสาขา
       for (const s in a) a[s] += b.aspects?.[k]?.[s] ?? 0; // บวกจำนวนของสาขานั้นเข้าไป (ไม่มีข้อมูล = 0)
-    }
+    }  // จบลูปทุกสาขา
     const m = mentions(a); // จำนวนครั้งรวมทั้งเครือ
     a.score = m ? (a.positive - a.negative) / m : null; // สูตรเดียวกับ pipeline: (บวก − ลบ) ÷ ทั้งหมด
     a.label = verdict(a.score, m, min); // ตัดสิน label
     return [k, a]; // คู่ [รหัสด้าน, ผล]
-  }));
-}
+  }));  // จบ map ทุกด้าน
+}  // จบ overall
 
 // ข้อความใต้แถบในภาพรวม เช่น "บวก 84% จาก 337 รีวิว"
 export const overallText = a => mentions(a) // มีคนพูดถึงไหม
@@ -97,7 +97,7 @@ const bars = (b, names) => '<div class="asps">' // กล่องรวมท�
 // เลือกรีวิวตัวอย่างตามสัดส่วนจริง: ฝั่งส่วนน้อยได้ floor(n × สัดส่วน) ช่อง
 // เช่น บวก 11 ลบ 2 → 3 บวก 0 ลบ, บวก 6 ลบ 9 → 2 ลบ 1 บวก (ฝั่งน้อยต้อง ≥ 1/3 ถึงจะโผล่)
 // ข้อมูลไม่พอ → โชว์ทุกตัวอย่างที่มี (มีน้อยอยู่แล้ว และไม่ควรเลือกข้าง)
-export function pickSamples(a, s, n = 3) {
+export function pickSamples(a, s, n = 3) {  // a = ผลของด้าน, s = ตัวอย่างรีวิว, n = จำนวนที่โชว์
   const P = (s.positive || []).map(t => ['👍', t]); // รีวิวบวก ติดไอคอน 👍
   const N = (s.negative || []).map(t => ['👎', t]); // รีวิวลบ ติดไอคอน 👎
   if (a.label === NODATA) return [...P, ...N]; // ข้อมูลไม่พอ → เอาทุกอัน
@@ -106,10 +106,10 @@ export function pickSamples(a, s, n = 3) {
   const share = total ? Math.min(a.positive, a.negative) / total : 0; // สัดส่วนของฝั่งส่วนน้อย
   const nMinor = Math.min(minor.length, Math.floor(n * share)); // ฝั่งน้อยได้กี่ช่อง (ไม่เกินที่มีจริง)
   return [...major.slice(0, n - nMinor), ...minor.slice(0, nMinor)]; // ฝั่งหลักขึ้นก่อน ตามด้วยฝั่งน้อย
-}
+}  // จบ pickSamples
 
 // ส่วน "ตัวอย่างรีวิว" ใน popup: หัวข้อพับได้ทีละด้าน
-function samples(b, names) {
+function samples(b, names) {  // b = สาขา, names = ชื่อด้าน
   const parts = Object.entries(b.sample_reviews || {}).map(([k, s]) => { // ทีละด้านที่มีรีวิวตัวอย่าง
     const a = b.aspects[k]; // ตัวเลขของด้านนี้
     const items = a ? pickSamples(a, s) : []; // เลือกรีวิวที่จะโชว์
@@ -119,17 +119,17 @@ function samples(b, names) {
     return `<details${open}><summary>${esc(names[k])} ${chip(a)}</summary><ul>${list}</ul></details>`; // หัวข้อพับได้ + รายการ
   }).join(''); // ต่อทุกด้าน
   return parts ? `<div class="sec">ตัวอย่างรีวิว</div>${parts}` : ''; // มีอย่างน้อย 1 ด้าน → ใส่หัวข้อใหญ่ด้วย
-}
+}  // จบ samples
 
 // ดาว Google + จำนวนรีวิวที่วิเคราะห์ เช่น "★ 4.6 · 62 รีวิว"
 const rating = b => `<span class="star">★ ${b.google_rating ?? '-'}</span> · ${b.reviews_analyzed} รีวิว`; // ไม่มีดาว → แสดง -
 
 // HTML ของ popup สาขา (me = ตำแหน่งผู้ใช้ ใช้ทำลิงก์นำทาง)
-export function popupHtml(b, names, me) {
+export function popupHtml(b, names, me) {  // b = สาขา, names = ชื่อด้าน
   const gmaps = b.gmaps_url // มีลิงก์หน้าสาขาใน Google Maps ไหม
     ? `<a href="${esc(b.gmaps_url)}" target="_blank" rel="noopener">Google Maps</a>` // มี → ปุ่มเปิดหน้าสาขา (แท็บใหม่)
     : ''; // ไม่มี → ไม่ต้องมีปุ่ม
-  return [
+  return [  // ต่อ HTML หลายส่วนเป็นข้อความเดียว
     '<div class="popup">', // กล่องหลัก
     `<div class="name">${esc(b.name)}</div>`, // ชื่อสาขา
     `<div class="meta">${rating(b)}</div>`, // ดาว + จำนวนรีวิว
@@ -140,20 +140,20 @@ export function popupHtml(b, names, me) {
     gmaps, // ปุ่ม Google Maps
     '</div></div>', // ปิดแถวปุ่ม + กล่องหลัก
   ].join(''); // ต่อเป็นข้อความเดียว
-}
+}  // จบ popupHtml
 
 // การ์ด "ภาพรวมทั้งเครือ" ในแถบซ้าย (ov = ผลจาก overall())
-export function renderOverall(ov, names, nBranches) {
+export function renderOverall(ov, names, nBranches) {  // nBranches = จำนวนสาขา
   const el = document.getElementById('overall'); // กล่อง <details id="overall">
   const rows = Object.entries(ov) // ทีละด้าน
     .map(([k, a]) => aspectRow(names[k], a, `<small class="sub">${esc(overallText(a))}</small>`)) // แถว + บรรทัด % ที่ชม
     .join(''); // ต่อทุกแถว
   el.innerHTML = `<summary>📊 ภาพรวมทั้งเครือ <small>จาก ${nBranches} สาขา</small></summary><div class="asps">${rows}</div>`; // หัวข้อพับได้ + แถว
   el.hidden = false; // ตอนแรกซ่อนไว้ (กันกล่องว่าง) โหลดเสร็จค่อยโชว์
-}
+}  // จบ renderOverall
 
 // รายการสาขาในแถบซ้าย; rows = [{ b, i, d }] (i = ลำดับใน branches, d = ระยะทาง กม. หรือ null)
-export function renderList(rows, names) {
+export function renderList(rows, names) {  // names = ชื่อด้าน
   document.getElementById('list').innerHTML = rows.map(({ b, i, d }) => [ // สร้างการ์ดทีละสาขา
     `<button class="item" data-i="${i}">`, // การ์ดเป็นปุ่ม (กด Tab ถึงได้) จำลำดับสาขาไว้ใน data-i
     `<div class="head"><span class="name">${esc(b.name)}</span>`, // แถวบน: ชื่อสาขา
@@ -164,13 +164,13 @@ export function renderList(rows, names) {
     chips(b, names), // ป้าย 5 ด้าน
     '</button>', // ปิดการ์ด
   ].join('')).join(''); // ต่อส่วนต่างๆ เป็นการ์ด แล้วต่อทุกการ์ด
-}
+}  // จบ renderList
 
 // ไฮไลต์การ์ดของสาขาที่เลือก (i = ลำดับสาขา, null = ไม่มี)
-export function markActive(i) {
+export function markActive(i) {  // เรียกตอนเปิด popup / กดการ์ด
   document.querySelectorAll('.item.active').forEach(el => el.classList.remove('active')); // เอาไฮไลต์เก่าออก
   const el = document.querySelector(`.item[data-i="${i}"]`); // หาการ์ดของสาขานี้
   if (!el) return; // ไม่อยู่ในรายการ (เช่น ไม่ติด 10 สาขาใกล้สุด) → จบ
   el.classList.add('active'); // ใส่ไฮไลต์
   el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); // เลื่อนรายการให้เห็นการ์ด
-}
+}  // จบ markActive

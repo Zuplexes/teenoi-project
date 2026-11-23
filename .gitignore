@@ -1,16 +1,15 @@
+# ไฟล์/โฟลเดอร์ที่ไม่เอาขึ้น git (ใส่คอมเมนต์ท้ายบรรทัดไม่ได้ ต้องขึ้นบรรทัดใหม่ด้วย #)
+# data/raw/, data/clean/, data/predict/ และ models/ ตั้งใจให้ขึ้น git (ทีมใช้ข้อมูลและโมเดลชุดเดียวกันได้ทันที)
+
 # session Google ที่ล็อกอินไว้ (มี cookie บัญชี ห้าม commit เด็ดขาด)
 chrome_profile/
 # token / รหัสลับ (LABEL_STUDIO_API_KEY)
 .env
-# รีวิวที่ดึงจาก Google Maps + ฐานข้อมูลของ 6_predict.py (สร้างใหม่ได้ ไม่ขึ้น repo)
-data/raw/
-data/clean/
-data/predict/
-# โมเดลที่เทรนแล้ว (สร้างใหม่ได้ด้วย python 5_train.py)
-models/
+# log ของแต่ละรอบการรัน (สร้างใหม่ทุกครั้ง)
 logs/
-# ไฟล์ที่ Python สร้างเอง
+# cache ที่ Python สร้างเอง
 __pycache__/
+# virtual environment (สร้างใหม่ได้ด้วย python -m venv .venv)
 .venv/
 # .git ของ 4 repo เดิม (สำรองไว้ ประวัติถูกรวมเข้า repo นี้แล้ว ลบทิ้งได้)
 _old_repos/

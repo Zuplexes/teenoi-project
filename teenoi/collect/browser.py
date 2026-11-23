@@ -7,21 +7,21 @@ from pathlib import Path  # จัดการ path ของ profile
 from playwright.sync_api import sync_playwright  # ควบคุม browser แบบ synchronous
 
 # ต้องเป็น UA ของ Chrome desktop ถ้าใช้ UA ของ headless Chromium จะไม่มีแท็บ "รีวิว"
-USER_AGENT = (
+USER_AGENT = (  # User-Agent ที่ส่งให้ Google (ต่อสตริง 2 บรรทัดข้างล่าง)
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "  # ส่วนระบุ OS + engine
     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"  # ส่วนระบุเวอร์ชัน Chrome
-)
+)  # จบ USER_AGENT
 MAPS_URL = "https://www.google.com/maps?hl=th"  # หน้าแรกที่เปิดตอนล็อกอิน (hl=th = ภาษาไทย)
 DEFAULT_PROFILE = "chrome_profile"  # โฟลเดอร์ profile ถ้า config ไม่ได้ระบุ browser.profile_dir
 
 
-def _profile_dir(cfg):
+def _profile_dir(cfg):  # หาโฟลเดอร์ session
     """path เต็มของโฟลเดอร์ profile ที่เก็บ session Google"""
     return Path(cfg.get("browser", {}).get("profile_dir", DEFAULT_PROFILE)).resolve()  # resolve ให้เป็น path เต็ม
 
 
-@contextmanager
-def open_context(cfg, headless=None):
+@contextmanager  # ทำให้ฟังก์ชันข้างล่างใช้กับ with ได้
+def open_context(cfg, headless=None):  # เปิด Chrome แบบจำ session
     """with open_context(cfg) as ctx: page = ctx.new_page()"""
     b = cfg.get("browser", {})  # ส่วน browser: ใน config
     with sync_playwright() as p:  # เริ่ม Playwright (ปิดให้เองเมื่อออกจาก with)
@@ -33,14 +33,14 @@ def open_context(cfg, headless=None):
             viewport=b.get("viewport") or {"width": 1280, "height": 900},  # ขนาดหน้าต่าง
             user_agent=USER_AGENT,  # ปลอมเป็น Chrome desktop ปกติ
             args=["--blink-settings=imagesEnabled=false"],  # ไม่โหลดรูป หน้าเบาและเลื่อนไวขึ้น (ดาว/ข้อความไม่ใช่รูป)
-        )
-        try:
+        )  # จบการตั้งค่า browser
+        try:  # ลองทำงานใน with
             yield ctx  # ส่ง context ให้โค้ดใน with ใช้งาน
-        finally:
+        finally:  # ทำเสมอ แม้ error
             ctx.close()  # ปิด browser เสมอ แม้เกิด error กลางทาง
 
 
-def login(cfg):
+def login(cfg):  # ใช้โดย login.py
     """เปิดหน้าต่างให้ผู้ใช้ล็อกอิน Google เอง (ไม่กรอก email/password อัตโนมัติ)"""
     # ponytail: เปิด Chrome จริงตรง ๆ ไม่ผ่าน Playwright เพราะ Google ไม่ให้ล็อกอินใน browser ที่ถูก automation คุม
     # ("เบราว์เซอร์หรือแอปนี้อาจไม่ปลอดภัย") ต้องใช้คู่กับ browser.channel: chrome ตอน scrape

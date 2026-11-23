@@ -13,7 +13,7 @@ from .browser import open_context  # เปิด Chrome พร้อม session
 log = logging.getLogger(__name__)  # logger ชื่อ teenoi.collect.scraper
 
 # CSS selector ของหน้า Google Maps: Google เปลี่ยน class name บ่อย ถ้าดึงได้ 0 รีวิวให้แก้ที่นี่ที่เดียว
-SEL = {
+SEL = {  # ตัวเลือก element บนหน้า Google Maps
     "card": "div.jftiEf[data-review-id]",  # การ์ดรีวิว 1 ใบ (มี id ของรีวิว)
     "more": "button.w8nwRe[aria-expanded='false']",  # ปุ่ม "เพิ่มเติม" ที่ยังไม่ได้กด (ข้อความถูกตัด)
     "text": "span.wiI7pd",  # ข้อความรีวิว
@@ -26,19 +26,19 @@ SEL = {
     "address": "button[data-item-id='address']",  # ปุ่มที่อยู่ (ที่อยู่อยู่ใน aria-label)
     "place_rating": "div.F7nice span[aria-hidden='true']",  # คะแนนเฉลี่ยของร้าน เช่น 4.3
     "place_review_count": "div.F7nice",  # กล่องที่มีจำนวนรีวิว เช่น "(1,234)"
-}
+}  # จบ SEL
 # ข้อความบนหน้าเว็บที่ใช้หาปุ่ม (ต้องตรงกับ browser.locale: th-TH)
-TXT = {
+TXT = {  # ข้อความบนปุ่ม/หน้าเว็บ
     "tab_reviews": "รีวิว",  # ชื่อแท็บรีวิว
     "sort_button": "เกี่ยวข้องที่สุด",  # ปุ่มเปิดเมนูเรียงลำดับ (แสดงค่าปัจจุบัน)
     "limited_view": "มุมมองแบบจำกัด",  # ข้อความที่ขึ้นเมื่อยังไม่ได้ล็อกอิน
-}
+}  # จบ TXT
 # sort_by -> ข้อความในเมนูเรียงลำดับ (most_relevant คือค่าเริ่มต้น ไม่ต้องกด)
-SORT_MENU = {"newest": "ใหม่ที่สุด", "lowest_rating": "คะแนนต่ำสุด", "highest_rating": "คะแนนสูงสุด"}
+SORT_MENU = {"newest": "ใหม่ที่สุด", "lowest_rating": "คะแนนต่ำสุด", "highest_rating": "คะแนนสูงสุด"}  # ตัวเลือกการเรียงรีวิว -> ข้อความในเมนู
 RAW_COLUMNS = [  # คอลัมน์ของ reviews_raw.csv ตามลำดับ
     "branch_id", "branch", "rating", "date_text", "date_approx",  # สาขา ดาว วันที่
     "review", "gmaps_review_id", "source_url", "scraped_at",  # ข้อความ id ลิงก์ เวลาที่ดึง
-]
+]  # จบ RAW_COLUMNS
 KEEP_CARDS = 30  # การ์ดท้ายที่เก็บไว้ในหน้า: อ่านซ้ำได้อีก 2-3 รอบ เผื่อข้อความที่กด "เพิ่มเติม" แล้วขยายไม่ทัน
 PROGRESS_EVERY = 500  # log ความคืบหน้าทุก ๆ กี่การ์ด
 UNKNOWN_RATING = 9  # ใช้แทนดาวที่อ่านไม่ออก ให้มากกว่าทุก priority_max_rating จึงไม่ถูกนับเป็นดาวต่ำ
@@ -47,7 +47,7 @@ _DAYS = {"นาที": 0, "ชั่วโมง": 0, "วัน": 1, "สั�
 
 # JavaScript ที่รันในหน้าเว็บผ่าน page.evaluate
 # กดปุ่ม "เพิ่มเติม" ทุกปุ่มให้ข้อความเต็ม คืนจำนวนปุ่มที่กด
-_JS_EXPAND = "sel => { const b = document.querySelectorAll(sel); b.forEach(x => x.click()); return b.length; }"
+_JS_EXPAND = "sel => { const b = document.querySelectorAll(sel); b.forEach(x => x.click()); return b.length; }"  # JavaScript ที่รันในหน้าเว็บ (อธิบายข้างบน)
 _JS_CARDS = """sel => [...document.querySelectorAll(sel.card)].map(c => ({
     // อ่านการ์ดทุกใบในหน้าเป็น {id, text, stars, date}
     id: c.getAttribute('data-review-id'),
@@ -70,7 +70,7 @@ _JS_PRUNE = """([sel, keep]) => {
     return document.querySelectorAll(sel).length;
 }"""
 # true เมื่อมีการ์ดใหม่โหลดเข้ามาแล้ว (จำนวนการ์ดมากกว่า n)
-_JS_MORE_CARDS = "([sel, n]) => document.querySelectorAll(sel).length > n"
+_JS_MORE_CARDS = "([sel, n]) => document.querySelectorAll(sel).length > n"  # JavaScript ที่รันในหน้าเว็บ (อธิบายข้างบน)
 # เลื่อน panel รีวิวลงล่างสุด: ไล่จากการ์ดขึ้นไปหา element แรกที่เลื่อนได้ (ไม่ต้องพึ่ง class ของ panel)
 _JS_SCROLL = """sel => {
     let el = document.querySelector(sel);
@@ -84,54 +84,54 @@ _JS_SCROLL = """sel => {
 }"""
 
 
-class LimitedViewError(RuntimeError):
+class LimitedViewError(RuntimeError):  # error เฉพาะกรณีนี้ (scrape_many จับแล้วหยุดทั้งรอบ)
     """Google Maps เปิดแบบ "มุมมองแบบจำกัด" (ยังไม่ได้ล็อกอิน) เห็นรีวิวแค่ ~5 รีวิว"""
 
 
-def approx_date(date_text, now=None):
+def approx_date(date_text, now=None):  # แปลงวันที่แบบ "x เดือนที่แล้ว"
     """ "3 เดือนที่แล้ว" -> วันที่โดยประมาณ (YYYY-MM-DD) อ่านไม่ออกคืน None"""
     m = re.search(r"(\d+)?\s*(นาที|ชั่วโมง|วัน|สัปดาห์|เดือน|ปี)", date_text or "")  # จับ "ตัวเลข(ถ้ามี) + หน่วย"
     if not m:  # ไม่มีหน่วยเวลาที่รู้จัก
-        return None
+        return None  # อ่านไม่ออก
     days = int(m.group(1) or 1) * _DAYS[m.group(2)]  # ไม่มีตัวเลข ("สัปดาห์ที่แล้ว") = 1 หน่วย
     return ((now or datetime.now()) - timedelta(days=days)).date().isoformat()  # ย้อนจากเวลาปัจจุบัน
 
 
-def parse_place_url(url):
+def parse_place_url(url):  # แกะข้อมูลจากลิงก์ Google Maps
     """ดึง name, branch_id, lat, lng จาก URL แบบ /maps/place/<name>/...!1s0x..:0x..!3d<lat>!4d<lng>"""
     name = re.search(r"/maps/place/([^/@?]+)", url)  # ชื่อร้าน (encode แบบ URL)
     bid = re.search(r"!1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)", url)  # id ถาวรของสถานที่ (ใช้เป็น branch_id)
     lat = re.search(r"!3d(-?\d+(?:\.\d+)?)", url)  # ละติจูด
     lng = re.search(r"!4d(-?\d+(?:\.\d+)?)", url)  # ลองจิจูด
-    return {
+    return {  # คืน dict ข้อมูลสาขา
         "name": unquote(name.group(1)).replace("+", " ") if name else None,  # %E0%B8.. -> ไทย, + -> ช่องว่าง
         "branch_id": bid.group(1) if bid else None,  # ลิงก์สั้นยังไม่มี id จะได้ None
-        "lat": float(lat.group(1)) if lat else None,
-        "lng": float(lng.group(1)) if lng else None,
-    }
+        "lat": float(lat.group(1)) if lat else None,  # ละติจูด (ไม่มี = None)
+        "lng": float(lng.group(1)) if lng else None,  # ลองจิจูด (ไม่มี = None)
+    }  # จบ dict
 
 
-def _try(fn):
+def _try(fn):  # เรียกฟังก์ชันแบบไม่ให้ error หลุด
     """เรียก fn() ถ้า error คืน None (ใช้กับข้อมูลเสริมที่หาไม่เจอก็ไม่เป็นไร)"""
-    try:
-        return fn()
+    try:  # ลองเรียก
+        return fn()  # สำเร็จ = คืนผล
     except Exception:  # selector หาไม่เจอ / timeout
-        return None
+        return None  # ล้มเหลว = None
 
 
-def _num(text):
+def _num(text):  # ดึงตัวเลขจากข้อความ
     """ตัวเลขตัวแรกในข้อความ เช่น "4.3" -> 4.3, "1,234" -> 1234.0 ไม่เจอคืน None"""
     m = re.search(r"\d[\d,]*(?:\.\d+)?", text or "")  # ตัวเลขที่อาจมี , คั่นหลักพันและทศนิยม
     return float(m.group().replace(",", "")) if m else None  # ลบ , ก่อนแปลง
 
 
-def _rating(card):
+def _rating(card):  # ดึงจำนวนดาวจากการ์ด
     """จำนวนดาวจาก aria-label เช่น "4 ดาว" -> 4 อ่านไม่ออกคืน None"""
     m = re.search(r"\d", card["stars"])  # ดาวมีหลักเดียว (1-5)
-    return int(m.group()) if m else None
+    return int(m.group()) if m else None  # ตัวเลข 1-5 หรือ None
 
 
-def _read_place_info(page, url):
+def _read_place_info(page, url):  # อ่านข้อมูลร้านจากหน้าเว็บ
     """อ่านข้อมูลร้านจากหน้าที่เปิดอยู่: name, branch_id, lat, lng, gmaps_url, address, google_rating, review_count"""
     info = parse_place_url(page.url)  # URL เต็มหลัง redirect มี id/พิกัด
     info["branch_id"] = info["branch_id"] or url  # ไม่มี id ใน URL ใช้ลิงก์ที่ได้มาเป็น id แทน
@@ -143,23 +143,23 @@ def _read_place_info(page, url):
     cnt = _try(lambda: page.locator(SEL["place_review_count"]).first.inner_text(timeout=3000))  # ข้อความที่มี "(1,234)"
     cnt = re.search(r"\(([\d,]+)\)", cnt or "")  # ตัวเลขในวงเล็บ
     info["review_count"] = int(cnt.group(1).replace(",", "")) if cnt else None  # จำนวนรีวิวทั้งหมดของร้าน
-    return info
+    return info  # ข้อมูลร้านครบทุกช่อง
 
 
-def _apply_sort(page, sort_by):
+def _apply_sort(page, sort_by):  # กดเรียงรีวิว
     """กดเรียงรีวิวตาม sort_by คืน True ถ้าไม่ต้องเรียง (most_relevant) หรือเรียงสำเร็จ"""
     if sort_by not in SORT_MENU:  # most_relevant เป็นลำดับเริ่มต้นอยู่แล้ว
-        return True
-    try:
+        return True  # ไม่ต้องกด
+    try:  # ลองกดเมนู
         page.locator("button", has_text=TXT["sort_button"]).first.click(timeout=10000)  # เปิดเมนูเรียง
         page.locator("[role='menuitemradio']", has_text=SORT_MENU[sort_by]).first.click(timeout=10000)  # เลือกตัวเลือก
         time.sleep(2)  # รอรายการรีวิวโหลดใหม่ตามลำดับที่เลือก
-        return True
+        return True  # กดสำเร็จ
     except Exception:  # หาปุ่ม/ตัวเลือกไม่เจอ
-        return False
+        return False  # กดไม่สำเร็จ
 
 
-def _to_rows(found, info, url, max_reviews):
+def _to_rows(found, info, url, max_reviews):  # แปลงการ์ดเป็นแถวข้อมูล
     """แปลงการ์ดที่เก็บได้เป็นแถวตาม RAW_COLUMNS (ตัดเมื่อรีวิวที่มีข้อความครบ max_reviews)"""
     now = datetime.now()  # ใช้เวลาเดียวกันทั้งรอบ ทั้ง date_approx และ scraped_at
     rows, n_text = [], 0  # n_text = จำนวนรีวิวที่มีข้อความที่ใส่ไปแล้ว
@@ -167,24 +167,24 @@ def _to_rows(found, info, url, max_reviews):
         text = c["text"].strip()  # ข้อความรีวิว ("" = ให้แต่ดาว)
         if text:  # นับเฉพาะรีวิวที่มีข้อความ
             if n_text >= max_reviews:  # ครบเพดานแล้ว หยุด
-                break
-            n_text += 1
+                break  # หยุดใส่แถว
+            n_text += 1  # นับรีวิวที่มีข้อความ
         rows.append({  # รีวิวที่ไม่มีข้อความก็เก็บ (ไม่นับเพดาน) cleaner จะตัดทิ้งเอง
-            "branch_id": info["branch_id"],
-            "branch": info["name"],
-            "rating": _rating(c),
+            "branch_id": info["branch_id"],  # รหัสสาขา
+            "branch": info["name"],  # ชื่อสาขา
+            "rating": _rating(c),  # ดาว 1-5 (อ่านไม่ออก = None)
             "date_text": c["date"],  # ข้อความวันที่ดิบ
             "date_approx": approx_date(c["date"], now),  # วันที่โดยประมาณ
-            "review": text,
+            "review": text,  # ข้อความรีวิว ("" = ให้แต่ดาว)
             "gmaps_review_id": c["id"],  # id ของ Google ใช้กันดึงซ้ำ
             "source_url": url,  # ลิงก์ที่สั่งดึง (อาจเป็นลิงก์สั้น)
             "scraped_at": now.isoformat(timespec="seconds"),  # เวลาที่ดึง ใช้เรียงใหม่/เก่าตอนคัด
-        })
-    return rows
+        })  # จบแถวของรีวิวนี้
+    return rows  # ทุกแถวของสาขานี้
 
 
-def scrape_place(page, url, max_reviews, stop_at_ids=None, *, sort_by="newest", max_idle_rounds=8, delay=(1.2, 2.5),
-                 priority_target=None, priority_max_rating=4, stop_before=None):
+def scrape_place(page, url, max_reviews, stop_at_ids=None, *, sort_by="newest", max_idle_rounds=8, delay=(1.2, 2.5),  # ดึงรีวิว 1 สาขา (พารามิเตอร์อธิบายใน docstring ข้างล่าง)
+                 priority_target=None, priority_max_rating=4, stop_before=None):  # * ข้างบน = พารามิเตอร์หลัง * ต้องส่งแบบระบุชื่อ
     """ดึงรีวิวของ 1 สาขา คืน (place_info, reviews)
 
     stop_at_ids: ชุด gmaps_review_id ที่เคยดึงแล้ว ถ้าเรียงตามใหม่สุดแล้วเจอ id ในชุดนี้จะหยุดทันที
@@ -199,21 +199,21 @@ def scrape_place(page, url, max_reviews, stop_at_ids=None, *, sort_by="newest", 
 
     info = _read_place_info(page, url)  # ชื่อ id ที่อยู่ คะแนน
     if TXT["limited_view"] in page.content():  # ยังไม่ได้ล็อกอิน เห็นรีวิวแค่ไม่กี่อัน
-        raise LimitedViewError(f"Google Maps เปิดแบบ \"{TXT['limited_view']}\" ให้รัน python login.py เพื่อล็อกอินก่อน")
+        raise LimitedViewError(f"Google Maps เปิดแบบ \"{TXT['limited_view']}\" ให้รัน python login.py เพื่อล็อกอินก่อน")  # หยุดพร้อมบอกวิธีแก้
 
     page.locator(SEL["tab"], has_text=TXT["tab_reviews"]).first.click(timeout=15000)  # เปิดแท็บรีวิว
     time.sleep(1.5)  # รอแท็บรีวิวโหลด
     sorted_ok = _apply_sort(page, sort_by)  # เรียงตามที่ตั้งไว้
     if not sorted_ok and sort_by != "newest":  # รอบเสริม (เช่น คะแนนต่ำสุด) ถ้าเรียงไม่ได้ให้ข้าม ไม่งั้นจะได้รีวิวผิดกลุ่ม
-        log.warning("เรียงตาม \"%s\" ไม่สำเร็จ ข้ามรอบนี้: %s", SORT_MENU[sort_by], info["name"])
-        return info, []
+        log.warning("เรียงตาม \"%s\" ไม่สำเร็จ ข้ามรอบนี้: %s", SORT_MENU[sort_by], info["name"])  # เตือนใน log
+        return info, []  # ไม่ได้รีวิวจากรอบนี้
     if not sorted_ok:  # รอบ newest เรียงไม่ได้: ยังดึงต่อด้วยลำดับเริ่มต้น
-        log.warning("เรียงตาม \"%s\" ไม่สำเร็จ ใช้ลำดับเริ่มต้นแทน: %s", SORT_MENU[sort_by], info["name"])
+        log.warning("เรียงตาม \"%s\" ไม่สำเร็จ ใช้ลำดับเริ่มต้นแทน: %s", SORT_MENU[sort_by], info["name"])  # เตือนใน log
     newest = sort_by == "newest" and sorted_ok  # เรียงใหม่สุดจริงเท่านั้นจึงหยุดเมื่อเจอรีวิวเดิมได้
 
     if not _try(lambda: page.wait_for_selector(SEL["card"], timeout=15000)):  # ไม่มีการ์ดรีวิวขึ้นเลย
-        log.warning("ไม่พบการ์ดรีวิวของ %s (ถ้าเป็นทุกสาขา ให้ตรวจ SEL ใน scraper.py)", info["name"])
-        return info, []
+        log.warning("ไม่พบการ์ดรีวิวของ %s (ถ้าเป็นทุกสาขา ให้ตรวจ SEL ใน scraper.py)", info["name"])  # เตือนใน log
+        return info, []  # ไม่ได้รีวิว
 
     found, seen, idle = {}, set(), 0  # found: id -> card (dict คงลำดับที่เจอ), seen: ทุก id ที่เลื่อนผ่าน, idle: รอบที่ไม่มีอะไรใหม่
     while True:  # เลื่อนไปเรื่อย ๆ จนเข้าเงื่อนไขหยุดข้อใดข้อหนึ่ง
@@ -223,36 +223,36 @@ def scrape_place(page, url, max_reviews, stop_at_ids=None, *, sort_by="newest", 
         for c in page.evaluate(_JS_CARDS, SEL):  # ในหน้าเหลือแค่การ์ดท้าย ๆ เพราะลบของเก่าออกทุกรอบ
             seen.add(c["id"])  # จดว่าเลื่อนผ่านแล้ว
             if c["id"] in stop_at_ids:  # รีวิวที่เคยดึงไปแล้ว
-                hit_known = True
+                hit_known = True  # จำไว้ว่าเจอรีวิวเดิม
             elif c["id"] not in found or len(c["text"]) > len(found[c["id"]]["text"]):  # ใหม่ หรือข้อความยาวขึ้น (เพิ่งขยาย)
                 found[c["id"]] = c  # เก็บข้อความที่ยาวที่สุดของแต่ละ review id
         if hit_known and newest:  # เรียงใหม่สุดแล้วเจอของเดิม = ที่เหลือเก่ากว่าและมีแล้วทั้งหมด
-            break
+            break  # หยุดเลื่อน
         oldest = approx_date(next(reversed(found.values()))["date"]) if found else None  # วันที่ของรีวิวล่าสุดที่เลื่อนถึง
         if newest and stop_before and oldest and oldest < stop_before:  # ที่เหลือเก่ากว่าช่วงที่ต้องการทั้งหมด
-            break
+            break  # หยุดเลื่อน
         with_text = [c for c in found.values() if c["text"].strip()]  # เฉพาะรีวิวที่มีข้อความ
         if len(with_text) >= max_reviews:  # ครบเพดานต่อสาขา
-            break
+            break  # หยุดเลื่อน
         n_pri = sum(1 for c in with_text if (_rating(c) or UNKNOWN_RATING) <= priority_max_rating)  # จำนวนรีวิวดาวต่ำ
         if priority_target and n_pri >= priority_target:  # ได้รีวิวดาวต่ำครบเป้า
-            break
+            break  # หยุดเลื่อน
         if len(seen) // PROGRESS_EVERY > n_seen // PROGRESS_EVERY:  # สาขาใหญ่ใช้เวลานาน บอกความคืบหน้าเมื่อข้ามหลัก 500
-            log.info("  %s: เลื่อนถึง %d รีวิว (มีข้อความ %d, ดาว <= %d: %d)",
-                     info["name"], len(seen), len(with_text), priority_max_rating, n_pri)
+            log.info("  %s: เลื่อนถึง %d รีวิว (มีข้อความ %d, ดาว <= %d: %d)",  # บอกความคืบหน้า
+                     info["name"], len(seen), len(with_text), priority_max_rating, n_pri)  # ค่าที่ใส่แทน %s / %d ข้างบนตามลำดับ
         idle = idle + 1 if len(seen) == n_seen else 0  # รีวิวที่เคยดึงแล้วก็ถือว่าคืบหน้า
         if idle >= max_idle_rounds:  # เลื่อนแล้วไม่มีอะไรใหม่หลายรอบติด = สุดรายการ
-            break
+            break  # หยุดเลื่อน
         n_dom = page.evaluate(_JS_PRUNE, [SEL["card"], KEEP_CARDS])  # ลบการ์ดเก่าออกจากหน้า กันช้า
         page.evaluate(_JS_SCROLL, SEL["card"])  # เลื่อนลงให้ Google โหลดชุดถัดไป
         time.sleep(0.3)  # ให้หน้าเริ่มโหลด
         # ไปต่อทันทีที่การ์ดชุดใหม่โหลดเสร็จ delay เป็นเวลารอสูงสุด ไม่ใช่เวลารอตายตัว
-        _try(lambda: page.wait_for_function(_JS_MORE_CARDS, arg=[SEL["card"], n_dom], timeout=random.uniform(*delay) * 1000))
+        _try(lambda: page.wait_for_function(_JS_MORE_CARDS, arg=[SEL["card"], n_dom], timeout=random.uniform(*delay) * 1000))  # รอสูงสุดตาม delay
 
     return info, _to_rows(found, info, url, max_reviews)  # แปลงเป็นแถวพร้อมบันทึก
 
 
-def scrape_many(cfg, urls, known_ids_by_branch=None, on_place_done=None):
+def scrape_many(cfg, urls, known_ids_by_branch=None, on_place_done=None):  # ดึงรีวิวหลายสาขา (ใช้ทั้งขั้น 1 และ 6)
     """ดึงรีวิวหลายสาขา คืน DataFrame คอลัมน์ RAW_COLUMNS
 
     known_ids_by_branch: {branch_id: set(gmaps_review_id)} รีวิวที่เคยดึงแล้ว (ดึงเฉพาะที่ใหม่กว่า)
@@ -263,9 +263,9 @@ def scrape_many(cfg, urls, known_ids_by_branch=None, on_place_done=None):
     d = s.get("delay", {})  # ส่วน scraper.delay:
     priority_max_rating = (cfg.get("selection") or {}).get("priority_max_rating", 4)  # ดาว <= ค่านี้ = กลุ่มดาวต่ำ
     # review id ไม่ซ้ำกันข้ามสาขา จึงรวมเป็นชุดเดียวได้ (ลิงก์สั้นยังไม่รู้ branch_id ก่อนเปิดหน้า)
-    stop = set().union(*(known_ids_by_branch or {}).values())
+    stop = set().union(*(known_ids_by_branch or {}).values())  # รวม id ของทุกสาขาเป็นชุดเดียว
     # sort_by เป็นค่าเดียวหรือ list ก็ได้ (ดึงสาขาละหลายรอบ รอบหลังข้ามรีวิวที่รอบก่อนได้แล้ว)
-    sorts = s.get("sort_by", "newest")
+    sorts = s.get("sort_by", "newest")  # วิธีเรียง (ค่าเดียวหรือ list)
     sorts = [sorts] if isinstance(sorts, str) else sorts  # ทำให้เป็น list เสมอ
     sorts = sorted(sorts, key=lambda x: x != "newest")  # newest ต้องมาก่อน เพราะรอบ newest หยุดทันทีเมื่อเจอรีวิวที่รู้จัก
     rows, limited = [], False  # รีวิวทั้งหมด / เจอมุมมองแบบจำกัดหรือไม่
@@ -274,29 +274,29 @@ def scrape_many(cfg, urls, known_ids_by_branch=None, on_place_done=None):
         for i, (url, sort_by) in enumerate((u, x) for u in urls for x in sorts):  # ทุกคู่ (สาขา, วิธีเรียง)
             if i:  # ไม่ต้องรอก่อนรอบแรก
                 time.sleep(random.uniform(d.get("between_places_min", 4), d.get("between_places_max", 8)))  # พักระหว่างรอบ
-            try:
-                info, reviews = scrape_place(
+            try:  # ลองดึงสาขานี้
+                info, reviews = scrape_place(  # ดึง 1 สาขา ได้ข้อมูลร้าน + รีวิว
                     page, url, s.get("max_reviews_per_place", 1000), stop,  # หน้า ลิงก์ เพดาน รีวิวที่รู้จักแล้ว
                     sort_by=sort_by,  # วิธีเรียงของรอบนี้
                     max_idle_rounds=s.get("max_idle_rounds", 8),  # เลื่อนไม่เจออะไรใหม่กี่รอบแล้วหยุด
                     delay=(d.get("scroll_min", 1.2), d.get("scroll_max", 2.5)),  # ช่วงเวลารอหลังเลื่อน
                     # เป้าดาวต่ำใช้กับรอบ newest เท่านั้น (รอบอื่นเรียงตามดาวอยู่แล้ว)
-                    priority_target=s.get("priority_target") if sort_by == "newest" else None,
-                    priority_max_rating=priority_max_rating,
+                    priority_target=s.get("priority_target") if sort_by == "newest" else None,  # เป้ารีวิวดาวต่ำ
+                    priority_max_rating=priority_max_rating,  # ดาว <= ค่านี้ = ดาวต่ำ
                     stop_before=s.get("stop_before"),  # หยุดเมื่อเลื่อนถึงรีวิวเก่ากว่าวันนี้ (6_predict.py ตั้ง)
-                )
+                )  # จบการเรียก scrape_place
             except LimitedViewError as e:  # session หลุด สาขาต่อ ๆ ไปก็จะเจอเหมือนกัน
-                log.warning("%s", e)
-                limited = True
+                log.warning("%s", e)  # เตือนใน log
+                limited = True  # จำไว้บอกผู้เรียก
                 break  # หยุดทั้งหมด
             except Exception:  # error อื่นของสาขานี้ (timeout, หน้าเปลี่ยน ฯลฯ)
                 log.exception("ดึงรีวิวไม่สำเร็จ ข้ามสาขานี้: %s", url)  # log พร้อม traceback
                 continue  # ไปสาขาถัดไป
-            log.info("[%d/%d] %s (%s): ได้ %d รีวิว", i // len(sorts) + 1, len(urls), info["name"], sort_by, len(reviews))
+            log.info("[%d/%d] %s (%s): ได้ %d รีวิว", i // len(sorts) + 1, len(urls), info["name"], sort_by, len(reviews))  # ความคืบหน้า
             stop.update(r["gmaps_review_id"] for r in reviews)  # รอบถัดไปไม่เก็บรีวิวเหล่านี้ซ้ำ
             rows.extend(reviews)  # สะสมผล
             if on_place_done:  # ผู้เรียกอยากบันทึกทันที
-                on_place_done(info, reviews)
+                on_place_done(info, reviews)  # บันทึกผลของสาขานี้ทันที
     df = pd.DataFrame(rows, columns=RAW_COLUMNS)  # ตารางรีวิวรอบนี้ (ว่างก็ยังมีคอลัมน์ครบ)
     df.attrs["limited_view"] = limited  # แจ้งผู้เรียกว่าหยุดกลางทางหรือไม่
-    return df
+    return df  # ตารางรีวิวทั้งหมดรอบนี้

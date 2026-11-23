@@ -11,18 +11,18 @@ ratios: {train: 0.8, val: 0.1, test: 0.1}   # สัดส่วนจำนว�
 # รีวิวเดียวกัน ด้านเดียวกัน แต่ label หลาย span ที่ sentiment ต่างกัน (พบ 383 คู่) จะทำอย่างไร
 #   majority = ใช้เสียงข้างมาก ถ้าเสมอ -> ตัดทิ้ง (ความเห็นผสมไม่ใช่ neutral)
 #   drop     = ตัดทุกคู่ที่ขัดกันทิ้ง
-conflict_strategy: majority
+conflict_strategy: majority  # majority หรือ drop (อธิบายข้างบน)
 
 # ชื่อด้านใน Label Studio -> code = รหัสที่ใช้ในไฟล์/รายงาน/โมเดล, text = ชื่อด้านที่แสดงในผลสรุป
-aspects:
-  "อาหาร (Food)":               {code: food,        text: "อาหาร"}
-  "บริการ (Service)":           {code: service,     text: "บริการ"}
-  "บรรยากาศ (Environment)":     {code: environment, text: "บรรยากาศ"}
-  "เวลาในการรอ (Waiting Time)": {code: waiting,     text: "เวลาในการรอ"}
-  "ความสะอาด (Cleanliness)":    {code: cleanliness, text: "ความสะอาด"}
+aspects:  # ชื่อด้านใน Label Studio -> {code, text}
+  "อาหาร (Food)":               {code: food,        text: "อาหาร"}  # ด้านอาหาร
+  "บริการ (Service)":           {code: service,     text: "บริการ"}  # ด้านบริการ
+  "บรรยากาศ (Environment)":     {code: environment, text: "บรรยากาศ"}  # ด้านบรรยากาศ
+  "เวลาในการรอ (Waiting Time)": {code: waiting,     text: "เวลาในการรอ"}  # ด้านเวลาในการรอ
+  "ความสะอาด (Cleanliness)":    {code: cleanliness, text: "ความสะอาด"}  # ด้านความสะอาด
 
 # ชื่อ sentiment ใน Label Studio -> label ที่ใช้เทรน (ด้านที่ไม่ถูก label = none)
-sentiments:
-  "แย่ (Negative)": negative
-  "เฉยๆ (Neutral)": neutral
-  "ดี (Positive)": positive
+sentiments:  # ชื่อ sentiment ใน Label Studio -> label ที่ใช้เทรน
+  "แย่ (Negative)": negative  # แย่ = negative
+  "เฉยๆ (Neutral)": neutral  # เฉยๆ = neutral
+  "ดี (Positive)": positive  # ดี = positive

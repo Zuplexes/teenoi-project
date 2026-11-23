@@ -8,7 +8,7 @@ upload:                                      # ขั้นที่ 2: ส่�
   project_title: teenoi-data                 # ชื่อโปรเจกต์ ถ้ายังไม่มีจะสร้างให้พร้อม label_config
   label_config: configs/labelstudio_interface.xml  # Labeling Interface ที่ใช้ตอนสร้างโปรเจกต์ใหม่
   files:                                     # ไฟล์ CSV ที่จะ upload (ต้องมีคอลัมน์ review_id, review)
-    - data/clean/reviews_clean.csv
+    - data/clean/reviews_clean.csv  # ไฟล์รวมทุกสาขาจาก 1_collect_reviews.py
   batch_size: 500                            # จำนวนรีวิวต่อ 1 request
 
 fetch:                                       # ขั้นที่ 3: ดึงผล label กลับมาเทรน

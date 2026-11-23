@@ -14,8 +14,9 @@
 ## โครงสร้าง
 
 ทุกสคริปต์รันด้วย `python <ไฟล์>.py` **ไม่มี argument** ตั้งค่าทุกอย่างในไฟล์ `configs/` ของขั้นนั้น
+ทุกบรรทัดของโค้ดและ config มีคำอธิบายภาษาไทยกำกับ (ท้ายบรรทัด หรือบรรทัดบน)
 
-```
+```text
 ML-teenoi/
 ├── login.py                    # 0) ล็อกอิน Google ครั้งแรกครั้งเดียว (ใช้ร่วมกันขั้น 1 และ 6)
 ├── 1_collect_reviews.py        # 1) ดึงรีวิวจาก Google Maps + clean           -> data/raw/, data/clean/
@@ -27,7 +28,7 @@ ML-teenoi/
 ├── configs/
 │   ├── collect.yml             #    ของขั้น 1 (+ login.py)
 │   ├── labelstudio.yml         #    ของขั้น 2 (upload:) และ 3 (fetch:)
-│   ├── labelstudio_interface.xml  # Labeling Interface ของ Label Studio
+│   ├── labelstudio_interface.xml  # หน้าจอ label ของ Label Studio
 │   ├── split.yml               #    ของขั้น 4
 │   ├── train.yml               #    ของขั้น 5
 │   └── predict.yml             #    ของขั้น 6
@@ -40,47 +41,113 @@ ML-teenoi/
 ├── web/                        # 7) เว็บหาสาขาใกล้ฉัน + สรุป 5 ด้าน (static ล้วน ไม่มี build)
 ├── tests/                      # ทดสอบส่วนที่ไม่ต้องเปิด browser
 ├── data/
-│   ├── raw/, clean/            #    รีวิวที่ดึงมา (ไม่ขึ้น git)
+│   ├── raw/                    #    รีวิวดิบที่ดึงมา
+│   ├── clean/                  #    รีวิวหลัง clean (ส่งเข้า Label Studio)
 │   ├── label/                  #    ไฟล์ export จาก Label Studio
 │   ├── final/                  #    train.csv, val.csv, test.csv, split_info.json
-│   └── predict/                #    predict.db + output/ ของขั้น 6 (ไม่ขึ้น git)
-├── models/                     # โมเดลที่เทรนแล้ว (ไม่ขึ้น git เทรนใหม่ได้ในไม่กี่วินาที)
+│   └── predict/                #    predict.db + output/ ของขั้น 6
+├── models/                     # โมเดลที่เทรนแล้ว
 └── reports/                    # รายงานและกราฟผล test ของขั้น 5
 ```
+
+ข้อมูลใน `data/` และโมเดลใน `models/` ขึ้น git ด้วย clone ไปแล้วรันขั้น 6 หรือเปิดเว็บได้เลย
+ที่ไม่ขึ้น git: `.env` (API key), `chrome_profile/` (session Google), `logs/`, `.venv/`
 
 ## ติดตั้ง (ครั้งเดียว)
 
 ต้องมี Python 3.10+ และ Google Chrome ในเครื่อง (ไม่ต้องมี GPU)
 
 ```powershell
+cd D:\ML69\ML-teenoi
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-ขั้น 2 และ 3 ต้องมีไฟล์ `.env` ที่ root (ไม่ขึ้น git):
+ทุกครั้งที่เปิด terminal ใหม่ ให้รัน `.venv\Scripts\activate` ก่อน (หน้าบรรทัดจะขึ้น `(.venv)`)
 
-```
+ขั้น 2 และ 3 ต้องมีไฟล์ `.env` ที่ root ของ repo (ไม่ขึ้น git):
+
+```text
 LABEL_STUDIO_API_KEY=<Label Studio -> Account & Settings -> Personal Access Token หรือ Access Token>
 ```
 
-## วิธีรัน
+## ขั้นตอนการรัน
 
-```powershell
-python login.py                 # ครั้งแรก: ล็อกอิน Google ในหน้าต่าง Chrome แล้วปิดหน้าต่าง
-python 1_collect_reviews.py     # ดึงรีวิว + clean
-python 2_upload_labelstudio.py  # ส่งขึ้น Label Studio -> ให้คน label ในเว็บ
-python 3_fetch_labels.py        # ดึงผล label กลับมา
-python 4_split.py               # แบ่ง train/val/test
-python 5_train.py               # เทรน + รายงาน
-python 6_predict.py             # ใช้งานจริงกับทุกสาขา -> อัปเดตข้อมูลให้เว็บ
+### ภาพรวม
+
+```text
+login.py ─┬─> 1 ดึงรีวิว ─> 2 upload ─> [คน label บนเว็บ Label Studio] ─> 3 ดึง label ─> 4 แบ่งข้อมูล ─> 5 เทรน ─┐
+          │                                                                                                    │
+          └──────────────────────────────────────────────────────────> 6 ดึงรีวิวทุกสาขา + ทำนาย + สรุป <──────┘
+                                                                                     │
+                                                                                     v
+                                                                        7 เว็บ (web/output/branch_summary.json)
 ```
 
-ไม่ต้องรันครบทุกขั้นทุกครั้ง เช่น label เพิ่ม → รัน 3, 4, 5 / อยากอัปเดตผลสาขาบนเว็บ → รัน 6 แล้ว deploy เว็บ
+| ขั้น | คำสั่ง | ทำอะไร | ต้องมีก่อน | ได้อะไร | ใช้เวลา |
+|---|---|---|---|---|---|
+| 0 | `python login.py` | เปิด Chrome ให้ล็อกอิน Google แล้วปิดหน้าต่าง | Google Chrome | `chrome_profile/` | 1 นาที |
+| 1 | `python 1_collect_reviews.py` | ดึงรีวิวสาขาใน `collect.yml` + clean | ขั้น 0 | `data/raw/`, `data/clean/` | หลายนาที–ชั่วโมง |
+| 2 | `python 2_upload_labelstudio.py` | ส่งรีวิวขึ้น Label Studio | ขั้น 1, ไฟล์ `.env` | task ใน Label Studio | ไม่กี่วินาที |
+| – | (ทำบนเว็บ Label Studio) | คน label ด้าน + ความรู้สึก | ขั้น 2 | ผล label บน server | แล้วแต่คน |
+| 3 | `python 3_fetch_labels.py` | ดึงผล label กลับมา | ไฟล์ `.env` | `data/label/*.json` | ไม่กี่วินาที |
+| 4 | `python 4_split.py` | แปลง label เป็นตาราง แบ่ง train/val/test | ขั้น 3 | `data/final/` | ไม่กี่วินาที |
+| 5 | `python 5_train.py` | เทรน Naive Bayes + วัดผล test | ขั้น 4 | `models/`, `reports/` | ไม่กี่วินาที |
+| 6 | `python 6_predict.py` | ดึงรีวิวทุกสาขา → ทำนาย → สรุปรายสาขา | ขั้น 5 (+ ขั้น 0 ถ้าดึงรีวิว) | `web/output/branch_summary.json`, `data/predict/` | ไม่กี่วินาที–ชั่วโมง |
+| 7 | `cd web` → `python -m http.server 8000` | เปิดเว็บในเครื่องที่ http://localhost:8000 | ขั้น 6 | หน้าเว็บ | ทันที |
+
+### เลือกรันตามงาน
+
+ไม่ต้องรันครบทุกขั้นทุกครั้ง ข้อมูลและโมเดลใน repo พร้อมใช้แล้ว
+
+**ก. แค่ดูเว็บ** (ใช้ผลที่มีอยู่)
+
+```powershell
+cd web
+python -m http.server 8000      # แล้วเปิด http://localhost:8000
+```
+
+**ข. อัปเดตผลบนเว็บจากรีวิวที่มีอยู่แล้ว** (ไม่เปิด browser ไม่ต้องล็อกอิน)
+
+1. ใน `configs/predict.yml` ตั้ง `steps.scrape: false`
+2. `python 6_predict.py`
+3. ดูเว็บตามข้อ ก.
+
+**ค. ดึงรีวิวใหม่ของทุกสาขาแล้วอัปเดตเว็บ**
+
+1. `python login.py` (ครั้งแรก หรือเมื่อ log เตือน "มุมมองแบบจำกัด")
+2. ใน `configs/predict.yml` ตั้ง `steps.scrape: true` และแนะนำ `scraping.incremental: true`, `scraping.skip_if_scraped_within_days: 7` (ดึงเฉพาะรีวิวใหม่ เร็วกว่ามาก)
+3. `python 6_predict.py`
+
+**ง. มี label เพิ่มใน Label Studio → เทรนโมเดลใหม่**
+
+```powershell
+python 3_fetch_labels.py
+python 4_split.py
+python 5_train.py
+python 6_predict.py       # ทำนายใหม่ทุกรีวิวด้วยโมเดลใหม่อัตโนมัติ
+```
+
+**จ. เก็บรีวิวชุดใหม่ไปให้คน label**
+
+1. ใส่ลิงก์สาขาใน `configs/collect.yml` → `scraper.urls`
+2. `python 1_collect_reviews.py`
+3. `python 2_upload_labelstudio.py` แล้วให้คน label บนเว็บ Label Studio ต่อด้วยข้อ ง.
+
+**ฉ. ตรวจว่าโค้ดยังทำงาน**
+
+```powershell
+python tests/test_collect.py
+python tests/test_predict.py
+node web/js/ui.test.mjs        # ต้องมี Node.js
+```
+
+## รายละเอียดแต่ละขั้น
 
 ### 1) ดึงรีวิว — `configs/collect.yml`
 
-- ใส่ลิงก์สาขาใน `scraper.urls` หรือตั้ง `steps.find_branches: true` ให้ค้นหาสาขาเอง เปิด/ปิดแต่ละขั้นที่ `steps:`
+- ใส่ลิงก์สาขาใน `scraper.urls` หรือตั้ง `steps.find_branches: true` ให้ค้นหาสาขาเอง เปิด/ปิดขั้นย่อยที่ `steps:`
 - รันซ้ำได้: รีวิวที่อยู่ใน `data/raw/reviews_raw.csv` แล้วจะไม่ถูกดึงซ้ำ อยากดึงใหม่หมดให้ลบไฟล์นั้น
 - ขั้น clean: ตัดคำแปลของ Google, ลบ URL/HTML, `pythainlp.util.normalize`, ลดตัวอักษรซ้ำ, ตัดรีวิวสั้น/ภาษาอื่น/ซ้ำ
   ไม่ตัดคำและไม่ลบ stopwords (จะทำให้ "ไม่อร่อย" กลายเป็น "อร่อย")
@@ -111,7 +178,6 @@ python 6_predict.py             # ใช้งานจริงกับทุ�
 
 - **Multinomial Naive Bayes** แยก 1 โมเดลต่อ 1 ด้าน feature = **char n-gram** (ชิ้นตัวอักษร 1–4 ตัว ไม่ต้องตัดคำไทย)
 - เทรนบน train ดูคะแนนแต่ละด้านบน val ใน log (ใช้ตอนปรับ `alpha`) แล้ววัดผลบน test ครั้งเดียวตอนจบ
-- ใช้เวลาไม่กี่วินาทีบน CPU
 
 ผลบน test (1,467 แถว): **accuracy 0.756, F1 macro 0.532** (F1: none 0.85 · negative 0.56 · neutral 0.08 · positive 0.64)
 
@@ -134,7 +200,7 @@ python 6_predict.py             # ใช้งานจริงกับทุ�
 
 | ไฟล์ | คือ |
 |---|---|
-| `web/output/branch_summary.json` | สรุปรายสาขา รายด้าน + ตัวอย่างรีวิว **เว็บอ่านไฟล์นี้ตรง ๆ** (ขึ้น git) |
+| `web/output/branch_summary.json` | สรุปรายสาขา รายด้าน + ตัวอย่างรีวิว **เว็บอ่านไฟล์นี้ตรง ๆ** |
 | `data/predict/output/review_predictions.csv` | ผลทำนายรายรีวิว |
 | `data/predict/output/branches.csv` | รายชื่อสาขา |
 
@@ -142,7 +208,7 @@ python 6_predict.py             # ใช้งานจริงกับทุ�
 
 เว็บหาสาขาใกล้ตัว พร้อมผลวิเคราะห์รีวิว 5 ด้าน (แผนที่ OpenStreetMap + Leaflet, static ล้วน ไม่มี build)
 
-```
+```text
 web/index.html      โครงหน้า
 web/css/style.css   หน้าตา
 web/js/config.js    ค่าคงที่ (path ข้อมูล, จุดเริ่มแผนที่, จำนวนสาขาที่แสดง, สีตาม label, เกณฑ์ ±0.3 ต้องตรงกับ configs/predict.yml)
@@ -153,36 +219,24 @@ web/js/main.js      จุดเริ่ม: โหลดข้อมูลแ�
 web/output/         branch_summary.json ที่ 6_predict.py เขียนให้
 ```
 
-รันในเครื่อง (ดับเบิลคลิกเปิดไฟล์ตรง ๆ ไม่ได้ เพราะ ES module และ fetch ใช้กับ `file://` ไม่ได้):
-
-```powershell
-cd web
-python -m http.server 8000      # แล้วเปิด http://localhost:8000
-```
-
-Deploy (Vercel): `cd web` แล้ว `vercel login` → `vercel --prod` (Framework = **Other**, build command เว้นว่าง)
-ถ้าต่อ Vercel กับ GitHub ให้ตั้ง **Root Directory = `web`**
-
-อัปเดตข้อมูลบนเว็บ: `python 6_predict.py` → `cd web` → `vercel --prod`
-
-## ทดสอบ
-
-```powershell
-python tests/test_collect.py
-python tests/test_predict.py
-node web/js/ui.test.mjs
-```
+- เปิดในเครื่อง: `cd web` → `python -m http.server 8000` → http://localhost:8000
+  (ดับเบิลคลิกเปิดไฟล์ตรง ๆ ไม่ได้ เพราะ ES module และ fetch ใช้กับ `file://` ไม่ได้)
+- Deploy (Vercel): `cd web` → `vercel login` → `vercel --prod` (Framework = **Other**, build command เว้นว่าง)
+  ถ้าต่อ Vercel กับ GitHub ให้ตั้ง **Root Directory = `web`**
 
 ## ข้อควรระวัง
 
 - การ scrape ขัดกับ Terms of Service ของ Google ควรใช้บัญชีสำรองและดึงในปริมาณพอเหมาะ
 - `chrome_profile/` มี session Google ที่ล็อกอินอยู่ และ `.env` มี API key — ห้าม commit หรือแชร์ (อยู่ใน `.gitignore` แล้ว)
+- `data/` มีข้อความรีวิวจาก Google Maps (ไม่มีชื่อผู้รีวิว) ถ้า repo เป็น public ข้อความเหล่านี้จะเปิดเผยด้วย
 - log เตือน "มุมมองแบบจำกัด" = session หลุด ให้รัน `python login.py` ใหม่
 - ดึงได้ 0 รีวิวทุกสาขา = Google เปลี่ยน class name ให้แก้ dict `SEL` ใน `teenoi/collect/scraper.py`
 
 | อาการ | แก้ |
 |---|---|
+| `ModuleNotFoundError` | ยังไม่ได้ `.venv\Scripts\activate` หรือยังไม่ได้ `pip install -r requirements.txt` |
 | `ไม่พบ data/final/split_info.json` | รัน `python 4_split.py` |
 | `ไม่พบโมเดลที่ models/...` | รัน `python 5_train.py` |
 | `ไม่รู้จัก aspect/sentiment '...'` | เพิ่มชื่อนั้นใน `configs/split.yml` |
 | `ยังไม่ได้ใส่ LABEL_STUDIO_API_KEY` | สร้างไฟล์ `.env` ตามหัวข้อติดตั้ง |
+| เว็บขึ้น "โหลดข้อมูลไม่ได้" | เปิดผ่าน `python -m http.server` ไม่ใช่ดับเบิลคลิกไฟล์ |

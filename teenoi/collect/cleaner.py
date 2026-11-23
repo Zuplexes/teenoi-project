@@ -19,22 +19,22 @@ DEFAULT_CLEANING = {  # ค่าเริ่มต้น ใช้เมื่�
     "min_length": 3,  # ข้อความสั้นกว่านี้ตัดทิ้ง
     "drop_duplicates": True,  # ตัดข้อความที่ซ้ำกันเป๊ะ
     "languages": ["th", "en"],  # ภาษาที่เก็บไว้ (ว่าง = ไม่กรองภาษา)
-}
+}  # จบค่าเริ่มต้นการ clean
 
 # emoji: บล็อก U+1F000-1FAFF (หน้ายิ้ม/สัญลักษณ์), U+2600-27BF (☀-➿), U+2B00-2BFF (ลูกศร/ดาว),
 # U+FE0F (variation selector ที่ต่อท้าย emoji) และ U+200D (ZWJ ที่ใช้เชื่อม emoji หลายตัว)
-_EMOJI = re.compile("[\U0001F000-\U0001FAFF☀-➿⬀-⯿️‍]")
+_EMOJI = re.compile("[\U0001F000-\U0001FAFF☀-➿⬀-⯿️‍]")  # ตัวจับ emoji ตามช่วง Unicode ข้างบน
 _THAI = re.compile("[฀-๿]")  # ช่วงตัวอักษรไทยใน Unicode
 _TRANSLATED_MARK = "(แปลโดย Google)"  # ป้ายที่ Google ใส่หน้าข้อความที่แปลอัตโนมัติ
 _ORIGINAL_MARK = "(ต้นฉบับ)"  # ป้ายที่ Google ใส่หน้าข้อความต้นฉบับ
 
 
-def _cfg(cfg):
+def _cfg(cfg):  # รวมค่าเริ่มต้นกับค่าที่ตั้ง
     """รวมค่าที่ผู้ใช้ตั้งทับค่าเริ่มต้น"""
     return {**DEFAULT_CLEANING, **(cfg or {})}  # key ใน cfg ชนะ DEFAULT_CLEANING
 
 
-def clean_text(text, cfg=None):
+def clean_text(text, cfg=None):  # clean ข้อความ 1 รีวิว
     """clean ข้อความรีวิว 1 ข้อความตามขั้นตอนใน cfg (ลำดับขั้นมีผล ห้ามสลับ)"""
     c = _cfg(cfg)  # config ที่รวมค่าเริ่มต้นแล้ว
     text = "" if text is None or text != text else str(text)  # None/NaN -> "" (NaN เป็นค่าเดียวที่ไม่เท่ากับตัวเอง)
@@ -58,18 +58,18 @@ def clean_text(text, cfg=None):
     return re.sub(r"\s*(…|\.{3,})$", "", text)  # ตัด "…" หรือ "..." ท้ายข้อความ (Google ตัดข้อความยาว)
 
 
-def detect_language(text):
+def detect_language(text):  # เดาภาษาของข้อความ
     """เดาภาษาจากตัวอักษร: "th" / "en" / "other" """
     # ponytail: ดูจากชุดตัวอักษรเท่านั้น ภาษาอื่นที่ใช้อักษรละตินล้วนจะถูกนับเป็น en
     # ถ้าต้องแยกละเอียดกว่านี้ค่อยเปลี่ยนไปใช้ไลบรารีตรวจภาษา
     if _THAI.search(text):  # มีอักษรไทยแม้ตัวเดียว (รีวิวผสมไทย-อังกฤษ) นับเป็นไทย
-        return "th"
+        return "th"  # ไทย
     if any(ch.isalpha() and not ch.isascii() for ch in text):  # มีตัวอักษรที่ไม่ใช่ ASCII เช่น ญี่ปุ่น จีน
-        return "other"
+        return "other"  # ภาษาอื่น
     return "en" if re.search(r"[A-Za-z]", text) else "other"  # มีอักษรอังกฤษ = en, ไม่มีเลย (emoji ล้วน) = other
 
 
-def select_per_branch(df, per_branch, priority_max_rating=4):
+def select_per_branch(df, per_branch, priority_max_rating=4):  # คัดรีวิวต่อสาขาตามโควตา (ใช้ใน 1_collect_reviews.py)
     """คัดสาขาละไม่เกิน per_branch แถว: ดาว <= priority_max_rating ก่อน ที่เหลือเติมด้วยดาวสูงกว่า
 
     กลุ่มเติมสลับดาวทีละแถว (เช่น 5, 4, 5, 4, ...) จึงได้แต่ละดาวเท่า ๆ กัน ถ้าดาวไหนหมดก่อน ที่เหลือเป็นดาวอื่น
@@ -79,13 +79,13 @@ def select_per_branch(df, per_branch, priority_max_rating=4):
     order = df.sort_values("scraped_at", ascending=False, kind="stable")  # รอบดึงล่าสุดก่อน (stable = คงลำดับเดิมในรอบเดียวกัน)
     fill = ~(order["rating"] <= priority_max_rating)  # True = กลุ่มเติม (ดาวสูง หรือไม่มีดาว)
     # turn: กลุ่มดาวต่ำ = -1 (มาก่อนทั้งหมด), กลุ่มเติม = ลำดับที่ของแถวนั้นภายในดาวเดียวกันของสาขา (0, 1, 2, ...)
-    turn = order.groupby(["branch_id", "rating"], dropna=False).cumcount().where(fill, -1)
+    turn = order.groupby(["branch_id", "rating"], dropna=False).cumcount().where(fill, -1)  # ลำดับที่ของแต่ละแถว: ดาวต่ำ = -1, กลุ่มเติม = 0, 1, 2, ... แยกตามสาขา+ดาว
     order = order.assign(_turn=turn).sort_values("_turn", kind="stable")  # เรียงตาม turn: ดาวต่ำก่อน แล้วสลับดาวทีละแถว
     keep = order.groupby("branch_id", sort=False).head(per_branch).index  # หัวตาราง per_branch แถวของแต่ละสาขา
     return df.loc[keep.sort_values()]  # คืนตามลำดับเดิมของ df (เรียงตาม index)
 
 
-def clean_dataframe(df, cfg=None):
+def clean_dataframe(df, cfg=None):  # clean ทั้งตาราง + กรองแถว + ใส่ review_id
     """clean คอลัมน์ review แล้วกรองแถว ใส่ review_id 1, 2, 3, ...
 
     จำนวนแถวที่ถูกตัดแต่ละขั้นอยู่ใน df.attrs["dropped"]
@@ -95,7 +95,7 @@ def clean_dataframe(df, cfg=None):
     df["review"] = df["review"].map(lambda t: clean_text(t, c))  # clean ทีละข้อความ
     dropped = {}  # เหตุผล -> จำนวนแถวที่ถูกตัด
 
-    def keep(mask, reason):
+    def keep(mask, reason):  # ตัวช่วยกรองแถวพร้อมจดสถิติ
         """เก็บเฉพาะแถวที่ mask เป็น True และจดจำนวนที่ถูกตัด"""
         nonlocal df  # แก้ตัวแปร df ของฟังก์ชันด้านนอก
         dropped[reason] = int((~mask).sum())  # นับแถวที่ไม่ผ่าน
@@ -105,11 +105,11 @@ def clean_dataframe(df, cfg=None):
     min_len = c["min_length"]  # ความยาวขั้นต่ำ
     keep(df["review"].str.len() >= min_len, f"สั้นกว่า {min_len} ตัวอักษร (รวมรีวิวที่ไม่มีข้อความ)")  # รีวิวที่ให้แต่ดาวจะเป็น "" และถูกตัดตรงนี้
     if c["languages"]:  # กรองภาษาเมื่อระบุรายการภาษา
-        keep(df["review"].map(detect_language).isin(c["languages"]), f"ภาษาไม่อยู่ใน {c['languages']}")
+        keep(df["review"].map(detect_language).isin(c["languages"]), f"ภาษาไม่อยู่ใน {c['languages']}")  # กรองภาษา
     if c["drop_duplicates"]:  # ตัดข้อความซ้ำ เก็บแถวแรกที่เจอ
-        keep(~df["review"].duplicated(), "ข้อความซ้ำ")
+        keep(~df["review"].duplicated(), "ข้อความซ้ำ")  # กรองข้อความซ้ำ
 
     df = df.reset_index(drop=True)  # index ใหม่ 0, 1, 2, ... หลังกรอง
     df.insert(0, "review_id", range(1, len(df) + 1))  # review_id เริ่มที่ 1 เป็นคอลัมน์แรก
     df.attrs["dropped"] = dropped  # แนบสถิติไว้ให้ 1_collect_reviews.py พิมพ์สรุป
-    return df
+    return df  # ตารางหลัง clean

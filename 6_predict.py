@@ -11,19 +11,19 @@ os.chdir(ROOT)  # ให้ path สัมพัทธ์ใน config อ้า
 from teenoi.config import load_config, setup_logging  # noqa: E402  โหลด config + ตั้งค่า log ให้เขียนลงไฟล์ + หน้าจอ
 from teenoi.predict import collector, db, exporter, predictor, summarizer  # noqa: E402  โมดูลของแต่ละขั้น
 
-CONFIG = "configs/predict.yml"
+CONFIG = "configs/predict.yml"  # ไฟล์ config ของขั้นนี้
 REQUIRED = [  # key ที่ต้องมีใน config ไม่งั้นหยุดทำงานตั้งแต่ต้น
     "steps", "browser.profile_dir", "branches.search_queries", "scraping.max_reviews_first_run",  # ขั้นตอน/browser/สาขา/การดึง
     "model.file", "model.confidence_threshold",  # โมเดล
     "summary.min_mentions", "summary.positive_threshold", "summary.negative_threshold",  # เกณฑ์สรุป
     "summary.sample_reviews_per_label",  # จำนวนตัวอย่างรีวิว
     "output.db_file", "output.review_predictions_file", "output.branch_summary_file", "output.branches_file",  # ไฟล์ผล
-]
+]  # จบรายการ key ที่ต้องมี
 log = logging.getLogger("predict")  # logger หลักของขั้นนี้
 VERDICTS = ["ดี", "เฉยๆ", "แย่", "ข้อมูลไม่พอ"]  # ลำดับผลสรุปที่จะแสดงบนหน้าจอ
 
 
-def main():
+def main():  # จุดเริ่มของขั้นที่ 6
     cfg = load_config(CONFIG, REQUIRED)  # โหลด + ตรวจ config
     setup_logging(cfg.get("log_level", "INFO"), "logs", "predict")  # log ลงโฟลเดอร์ logs ชื่อไฟล์ขึ้นต้นด้วย predict
     conn = db.connect(cfg["output"]["db_file"])  # เปิดฐานข้อมูล (สร้างตารางถ้ายังไม่มี)
@@ -31,7 +31,7 @@ def main():
     enabled = cfg["steps"]  # ขั้นไหนเปิด/ปิด
     results = {}  # เก็บผลลัพธ์ของแต่ละขั้น
 
-    def run(name, fn):
+    def run(name, fn):  # ตัวช่วยรันขั้นย่อย (ใช้ซ้ำ 5 ครั้งข้างล่าง)
         """รันขั้น name ถ้าเปิดไว้ใน config พร้อมบันทึกประวัติลงตาราง runs แล้วคืนผลลัพธ์ (ปิดไว้ = None)"""
         if enabled.get(name):  # ทำเฉพาะขั้นที่ตั้งเป็น true
             log.info("===== %s =====", name)  # แสดงหัวข้อขั้นใน log
@@ -48,7 +48,7 @@ def main():
     print_report(cfg, conn, results, summary)  # แสดงสรุปให้ผู้ใช้ตรวจ
 
 
-def print_report(cfg, conn, results, summary):
+def print_report(cfg, conn, results, summary):  # พิมพ์สรุปท้ายการรัน
     """พิมพ์สรุปผลการรันรอบนี้ออกหน้าจอ"""
     n_branches = conn.execute("SELECT COUNT(*) FROM branches").fetchone()[0]  # จำนวนสาขาทั้งหมดในฐานข้อมูล
     print("\n===== สรุป =====")  # หัวข้อ

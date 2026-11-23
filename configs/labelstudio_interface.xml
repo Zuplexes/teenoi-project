@@ -20,8 +20,8 @@
       <Label value="เวลาในการรอ (Waiting Time)" background="#ffa726"/>
       <!-- หมวดความสะอาด (สีฟ้าอมเขียว) -->
       <Label value="ความสะอาด (Cleanliness)" background="#26c6da"/>
-    </Labels>
-  </View>
+    </Labels>  <!-- จบชุด label หมวดหมู่ -->
+  </View>  <!-- จบกรอบขั้นตอนที่ 1 -->
 
   <!-- ขั้นตอนที่ 2: ระบุความรู้สึกของแต่ละช่วงที่ไฮไลท์ -->
   <View style="margin-top: 20px;">
@@ -37,6 +37,6 @@
       <Choice value="เฉยๆ (Neutral)"/>
       <!-- ความรู้สึกด้านลบ -->
       <Choice value="แย่ (Negative)"/>
-    </Choices>
-  </View>
-</View>
+    </Choices>  <!-- จบชุดตัวเลือกความรู้สึก -->
+  </View>  <!-- จบกรอบขั้นตอนที่ 2 -->
+</View>  <!-- จบกรอบนอกสุด -->

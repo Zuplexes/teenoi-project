@@ -2,106 +2,105 @@
 # predict.yml — ตั้งค่าทุกอย่างของขั้นที่ 6 (6_predict.py อ่านไฟล์นี้)
 # =====================================================================
 
-seed: 42                         # ค่าสุ่มตั้งต้น (ไว้ทำให้ผลรันซ้ำได้เหมือนเดิม)
 log_level: INFO                  # ระดับ log: DEBUG ละเอียดสุด | INFO ปกติ | WARNING เฉพาะคำเตือน
 
 # --- เปิด/ปิดแต่ละขั้นของ pipeline (true = ทำ, false = ข้าม) ---
-steps:
+steps:  # ขั้นย่อยของ 6_predict.py ทำตามลำดับข้างล่าง
   find_branches: false           # ค้นหาสาขาด้วยชื่อบน Google Maps (ปิดไว้ ใช้ลิงก์ใน branches.extra_urls แทน)
-  scrape: true                   # ดึงรีวิวจาก Google Maps ลงฐานข้อมูล
+  scrape: false                  # ดึงรีวิวจาก Google Maps ลงฐานข้อมูล
   predict: true                  # ให้โมเดลทำนาย sentiment แต่ละด้านของรีวิว
   summarize: true                # สรุปผลรายสาขา รายด้าน
   export: true                   # เขียนไฟล์ผลลัพธ์ (json/csv) ตามที่ระบุใน output
 
 # --- ตั้งค่า browser ที่ใช้เปิด Google Maps ---
-browser:
+browser:  # ตั้งค่า Chrome ที่ Playwright เปิด
   headless: true                 # true = ไม่แสดงหน้าต่าง browser, false = เห็นหน้าต่าง (ไว้ debug)
   channel: chrome                # ใช้ Google Chrome ในเครื่อง (null = Chromium ของ Playwright ซึ่ง Google ไม่ให้ล็อกอิน)
   profile_dir: chrome_profile    # โฟลเดอร์เก็บ session ที่ล็อกอินไว้ (สร้างโดย python login.py) ต้องตรงกับใน configs/collect.yml
   locale: th-TH                  # ภาษาของหน้าเว็บ (ให้วันที่/ข้อความรีวิวออกมาเป็นไทย)
 
 # --- รายชื่อสาขาที่จะดึงรีวิว ---
-branches:
+branches:  # สาขาที่จะดึงรีวิว
   search_queries: []             # คำค้นหาสาขา ใช้เฉพาะตอน find_branches: true (เช่น "สุกี้ตี๋น้อย กรุงเทพ")
   name_must_contain: "ตี๋น้อย"   # ผลค้นหาที่ชื่อไม่มีคำนี้จะถูกตัดทิ้ง (กันร้านอื่นหลุดมา)
   extra_urls:                    # ลิงก์สาขาบรรทัดละสาขา (ลิงก์ค้นหาต้องเจอร้านเดียว ไม่งั้นสาขานั้นถูกข้าม)
     # --- กรุงเทพฯ / ปริมณฑล (ชุดเพิ่ม) ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+มาร์เก็ต+Supreme"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางนา+มาร์เก็ต"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศิลามาร์เก็ต"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+2"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ออนติวานนท์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะไนน์+ติวานนท์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ราชพฤกษ์+ปั๊มคาลเท็กซ์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Fourth+พุทธมณฑลสาย+4"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศาลายา+วัน"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตลาดไทยสมบูรณ์+พระประแดง"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+บางบัวทอง"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พระราม+2+บางขุนเทียน"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Mingle+Mall+รังสิต"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โลตัส+คลอง+4"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+K-Space+ลำลูกกา+คลอง+6"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Urban+ศรีนครินทร์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+เทพารักษ์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Village+Hub+ราชพฤกษ์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+ประเวศ"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลำลูกกา+คลอง+2"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Terminal+21+พระราม+3"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+มาร์เก็ต+Supreme"  # สาขา ศรีนครินทร์ มาร์เก็ต Supreme
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางนา+มาร์เก็ต"  # สาขา บางนา มาร์เก็ต
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศิลามาร์เก็ต"  # สาขา ศิลามาร์เก็ต
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+2"  # สาขา เลียบทางด่วน 2
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ออนติวานนท์"  # สาขา ออนติวานนท์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะไนน์+ติวานนท์"  # สาขา เดอะไนน์ ติวานนท์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ราชพฤกษ์+ปั๊มคาลเท็กซ์"  # สาขา ราชพฤกษ์ ปั๊มคาลเท็กซ์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Fourth+พุทธมณฑลสาย+4"  # สาขา The Fourth พุทธมณฑลสาย 4
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศาลายา+วัน"  # สาขา ศาลายา วัน
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตลาดไทยสมบูรณ์+พระประแดง"  # สาขา ตลาดไทยสมบูรณ์ พระประแดง
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+บางบัวทอง"  # สาขา Jas Green บางบัวทอง
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พระราม+2+บางขุนเทียน"  # สาขา พระราม 2 บางขุนเทียน
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Mingle+Mall+รังสิต"  # สาขา Mingle Mall รังสิต
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โลตัส+คลอง+4"  # สาขา โลตัส คลอง 4
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+K-Space+ลำลูกกา+คลอง+6"  # สาขา K-Space ลำลูกกา คลอง 6
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Urban+ศรีนครินทร์"  # สาขา Jas Urban ศรีนครินทร์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+เทพารักษ์"  # สาขา ศรีนครินทร์ เทพารักษ์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Village+Hub+ราชพฤกษ์"  # สาขา Village Hub ราชพฤกษ์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+ประเวศ"  # สาขา Jas Green ประเวศ
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลำลูกกา+คลอง+2"  # สาขา ลำลูกกา คลอง 2
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Terminal+21+พระราม+3"  # สาขา Terminal 21 พระราม 3
     # --- ปริมณฑล (สมุทรสาคร / สมุทรปราการ / นครปฐม) ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Porto+Chino+สมุทรสาคร"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Rainforest+กิ่งแก้ว"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Meet+and+Eat+นครปฐม"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Porto+Chino+สมุทรสาคร"  # สาขา Porto Chino สมุทรสาคร
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Rainforest+กิ่งแก้ว"  # สาขา Rainforest กิ่งแก้ว
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Meet+and+Eat+นครปฐม"  # สาขา Meet and Eat นครปฐม
     # --- ใจกลางเมือง / รัชดา / พระราม 4 / อนุสาวรีย์ฯ ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+MBK+Center"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+I'm+Park+จุฬา"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+พระราม+4"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+ชั้น+4"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Victory+Hub"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะ+สตรีท+รัชดา"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัชดา+ซอย+18"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+MBK+Center"  # สาขา MBK Center
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+I'm+Park+จุฬา"  # สาขา I'm Park จุฬา
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+พระราม+4"  # สาขา สวนเพลินมาร์เก็ต พระราม 4
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+ชั้น+4"  # สาขา สวนเพลินมาร์เก็ต ชั้น 4
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Victory+Hub"  # สาขา Victory Hub
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะ+สตรีท+รัชดา"  # สาขา เดอะ สตรีท รัชดา
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัชดา+ซอย+18"  # สาขา รัชดา ซอย 18
     # --- ลาดพร้าว / พหลโยธิน / เกษตร-นวมินทร์ / บางกะปิ ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+19"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+1"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เกษตร-นวมินทร์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดพร้าว-วังหิน+59"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตะวันนา+บางกะปิ"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+JC+Mall+นวมินทร์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+19"  # สาขา พหลโยธิน 19
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+1"  # สาขา เลียบทางด่วน 1
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เกษตร-นวมินทร์"  # สาขา เกษตร-นวมินทร์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดพร้าว-วังหิน+59"  # สาขา ลาดพร้าว-วังหิน 59
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตะวันนา+บางกะปิ"  # สาขา ตะวันนา บางกะปิ
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+JC+Mall+นวมินทร์"  # สาขา JC Mall นวมินทร์
     # --- รามอินทรา / สายไหม / มีนบุรี / ลาดกระบัง ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บ้านบางเขน"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รามอินทรา+23"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Alley+รามอินทรา+กม.9"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+คู้บอน"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลฯ-วัชรพล"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สายไหม+อเวนิว"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โอโซนวัน+สรงประภา"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+มีนบุรี+สุวินทวงศ์+3"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดกระบัง+24/1"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เจ้าคุณวิลล่า"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บ้านบางเขน"  # สาขา บ้านบางเขน
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รามอินทรา+23"  # สาขา รามอินทรา 23
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Alley+รามอินทรา+กม.9"  # สาขา The Alley รามอินทรา กม.9
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+คู้บอน"  # สาขา แจส กรีน วิลเลจ คู้บอน
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลฯ-วัชรพล"  # สาขา พหลฯ-วัชรพล
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สายไหม+อเวนิว"  # สาขา สายไหม อเวนิว
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โอโซนวัน+สรงประภา"  # สาขา โอโซนวัน สรงประภา
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+มีนบุรี+สุวินทวงศ์+3"  # สาขา มีนบุรี สุวินทวงศ์ 3
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดกระบัง+24/1"  # สาขา ลาดกระบัง 24/1
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เจ้าคุณวิลล่า"  # สาขา เจ้าคุณวิลล่า
     # --- ฝั่งธนบุรี / เพชรเกษม / ปิ่นเกล้า / พระราม 2 ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Sense+ปิ่นเกล้า"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ซีคอน+บางแค"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บิ๊กซี+เพชรเกษม"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เพชรเกษม+69/1"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะพาซิโอ+พาร์ค+กาญจนาภิเษก"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ธนบุรี+มาร์เก็ตเพลส"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมโทร+ทาวน์+กัลปพฤกษ์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Susco+พุทธบูชา"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+วิลเลจฮับ+ประชาอุทิศ+90"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Sense+ปิ่นเกล้า"  # สาขา The Sense ปิ่นเกล้า
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ซีคอน+บางแค"  # สาขา ซีคอน บางแค
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บิ๊กซี+เพชรเกษม"  # สาขา บิ๊กซี เพชรเกษม
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เพชรเกษม+69/1"  # สาขา เพชรเกษม 69/1
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะพาซิโอ+พาร์ค+กาญจนาภิเษก"  # สาขา เดอะพาซิโอ พาร์ค กาญจนาภิเษก
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ธนบุรี+มาร์เก็ตเพลส"  # สาขา ธนบุรี มาร์เก็ตเพลส
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมโทร+ทาวน์+กัลปพฤกษ์"  # สาขา เมโทร ทาวน์ กัลปพฤกษ์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Susco+พุทธบูชา"  # สาขา Susco พุทธบูชา
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+วิลเลจฮับ+ประชาอุทิศ+90"  # สาขา วิลเลจฮับ ประชาอุทิศ 90
     # --- นนทบุรี / ปทุมธานี ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัตนาธิเบศร์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางใหญ่"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+87"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัตนาธิเบศร์"  # สาขา รัตนาธิเบศร์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางใหญ่"  # สาขา บางใหญ่
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+87"  # สาขา พหลโยธิน 87
     # --- กรุงเทพฯ / นนทบุรี / ปทุมธานี (เพิ่มเติม) ---
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจ้งวัฒนะ"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+รามคำแหง"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เอส+พาร์ค+คลองหลวง"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะวอล์ค+เกษตร-นวมินทร์"
-    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมเจอร์+อเวนิว+รัชโยธิน"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจ้งวัฒนะ"  # สาขา แจ้งวัฒนะ
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+รามคำแหง"  # สาขา แจส กรีน วิลเลจ รามคำแหง
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เอส+พาร์ค+คลองหลวง"  # สาขา เอส พาร์ค คลองหลวง
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะวอล์ค+เกษตร-นวมินทร์"  # สาขา เดอะวอล์ค เกษตร-นวมินทร์
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมเจอร์+อเวนิว+รัชโยธิน"  # สาขา เมเจอร์ อเวนิว รัชโยธิน
   exclude_branch_ids: []         # branch_id ที่ไม่ต้องการ (ดู id ได้จาก branches.csv)
   refresh_days: 30               # ค้นหาสาขาใหม่ทุกกี่วัน (ใช้ตอน find_branches: true)
 
 # --- การดึงรีวิว ---
-scraping:
+scraping:  # ตั้งค่าการดึงรีวิว
   max_reviews_first_run: 500     # ดึงได้มากสุดกี่รีวิวต่อสาขา (เป็นเพดานของทุกรอบ)
   stop_older_than_months: 12     # หยุดเลื่อนเมื่อเจอรีวิวเก่ากว่านี้ (ควรเท่ากับ summary.recent_months, null = ดึงจนครบเพดาน)
                                  # ponytail: รีวิวที่เก่ากว่านี้จะไม่ถูกดึงย้อนหลัง ถ้าอยากได้ทีหลัง ให้ตั้ง incremental: false + skip_if_scraped_within_days: 0 แล้วรันหนึ่งรอบ
@@ -118,12 +117,12 @@ scraping:
 cleaning: {}                     # ว่าง = ใช้ DEFAULT_CLEANING ของ teenoi/collect/cleaner.py (แนะนำ ให้ตรงกับตอนเทรน) ใส่ key เพื่อทับเฉพาะค่านั้น
 
 # --- โมเดลที่ใช้ทำนาย ---
-model:
+model:  # ตั้งค่าโมเดล
   file: models/aspect_sentiment.joblib  # โมเดลจาก python 5_train.py (เทรนใหม่ = ทำนายใหม่ทั้งหมดอัตโนมัติ)
   confidence_threshold: 0.6      # ผลที่โมเดลมั่นใจต่ำกว่านี้ไม่นับตอนสรุป (Naive Bayes มั่นใจสูงเกินจริง: บน test 0.6 ตัดออกแค่ ~1%, 0.99 ตัด ~13%)
 
 # --- การสรุปผลรายสาขา ---
-summary:
+summary:  # เกณฑ์ตัดสินผลรายสาขา
   recent_months: 12              # นับเฉพาะรีวิวล่าสุดกี่เดือน (null = ทั้งหมด)
   min_mentions: 5                # ด้านไหนถูกพูดถึงน้อยกว่านี้ = "ข้อมูลไม่พอ"
   positive_threshold: 0.3        # คะแนน >= ค่านี้ = "ดี" (คะแนน = (บวก - ลบ) / จำนวนที่พูดถึง)
@@ -131,7 +130,7 @@ summary:
   sample_reviews_per_label: 3    # เก็บตัวอย่างรีวิวกี่อันต่อ positive/neutral/negative
 
 # --- ไฟล์ผลลัพธ์ ---
-output:
+output:  # ที่เก็บผลลัพธ์
   db_file: data/predict/predict.db                                    # ฐานข้อมูล SQLite เก็บสาขา รีวิว ผลทำนาย ประวัติการรัน
   review_predictions_file: data/predict/output/review_predictions.csv # ผลทำนายรายรีวิว (1 แถว = 1 รีวิว)
   branch_summary_file: web/output/branch_summary.json                 # สรุปรายสาขา -> เว็บอ่านไฟล์นี้ตรง ๆ (ขึ้น git เพราะ deploy ไปกับเว็บ)

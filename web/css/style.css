@@ -1,5 +1,5 @@
 /* ===== ตัวแปรสีและค่ากลาง (แก้ที่นี่ เปลี่ยนทั้งเว็บ) ===== */
-:root {
+:root {  /* ตัวแปร CSS ใช้ทั้งหน้า */
   --accent: #d84315; /* สีหลัก ส้มแดง: ปุ่ม, ขอบหมุด, ระยะทาง */
   --accent-dark: #b71c1c; /* สีหลักตอนชี้เมาส์ */
   --accent-soft: #fff3ef; /* พื้นการ์ดที่ถูกเลือก */
@@ -14,29 +14,29 @@
   --nodata: #b0b0b0; /* เทา = ข้อมูลไม่พอ */
   --shadow: 0 1px 3px rgb(0 0 0 / .06), 0 4px 14px rgb(0 0 0 / .06); /* เงานุ่มของการ์ด */
   --head: "Kanit", "Noto Sans Thai", system-ui, sans-serif; /* ฟอนต์หัวข้อ */
-}
+}  /* จบตัวแปร */
 
 /* ===== พื้นฐานทั้งหน้า ===== */
 * { box-sizing: border-box; } /* ความกว้างรวม padding + border แล้ว คำนวณง่าย */
 html, body { height: 100%; } /* ให้หน้าเต็มความสูงจอ */
-body {
+body {  /* พื้นหลังและตัวอักษรทั้งหน้า */
   margin: 0; /* ตัดขอบขาวรอบหน้า */
   display: flex; /* วางแถบซ้ายกับแผนที่เรียงแนวนอน */
   height: 100dvh; /* สูงเท่าจอจริง (dvh ไม่โดนแถบ URL บนมือถือบัง) */
   background: var(--bg); /* สีพื้นหลัง */
   color: var(--text); /* สีตัวอักษร */
   font: 15px/1.5 "Noto Sans Thai", system-ui, sans-serif; /* ฟอนต์เนื้อหา 15px ระยะบรรทัด 1.5 */
-}
+}  /* จบ body */
 
 /* ===== แถบซ้าย ===== */
-#side {
+#side {  /* แถบซ้าย (รายการสาขา) */
   width: 400px; /* กว้างคงที่บนจอใหญ่ */
   display: flex; /* เรียงหัว / ปุ่ม / รายการ */
   flex-direction: column; /* จากบนลงล่าง */
   background: var(--bg); /* สีพื้น */
   box-shadow: 2px 0 12px rgb(0 0 0 / .08); /* เงาแยกจากแผนที่ */
   z-index: 1; /* อยู่เหนือแผนที่ (เงาไม่โดนบัง) */
-}
+}  /* จบ #side */
 .brand { padding: 18px 18px 16px; color: #fff; background: linear-gradient(135deg, #f4511e, #c62828); } /* แถบหัว: ไล่สีส้ม → แดง ตัวหนังสือขาว */
 h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: Kanit หนา 22px */
 .brand p { margin: 2px 0 0; font-size: 14px; opacity: .9; } /* คำอธิบายใต้ชื่อ จางลงนิดหน่อย */
@@ -44,7 +44,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
 .controls { padding: 14px 14px 10px; background: var(--card); border-bottom: 1px solid var(--line); } /* ส่วนปุ่ม: พื้นขาว เส้นคั่นล่าง */
 
 /* ปุ่มทั่วไป */
-.btn {
+.btn {  /* ปุ่มทุกปุ่ม */
   font: inherit; /* ใช้ฟอนต์เดียวกับหน้า (ปุ่มปกติไม่สืบทอด) */
   font-weight: 500; /* หนาปานกลาง */
   padding: 10px 14px; /* ระยะในปุ่ม กดง่ายบนมือถือ */
@@ -54,7 +54,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
   background: var(--card); /* พื้นขาว */
   color: var(--text); /* สีตัวอักษร */
   transition: background .15s, transform .15s; /* เปลี่ยนสี / ยุบตัวแบบนุ่มๆ */
-}
+}  /* จบ .btn */
 .btn:hover:not(:disabled) { background: #f3f3f3; } /* ชี้เมาส์ → เทาอ่อน */
 .btn:active:not(:disabled) { transform: scale(.98); } /* กดค้าง → ยุบลงนิดหนึ่ง */
 .btn:disabled { opacity: .6; cursor: progress; } /* กำลังทำงาน → จางลง + เมาส์รูปรอ */
@@ -88,7 +88,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
 
 /* ===== รายการสาขา ===== */
 #list { flex: 1; overflow-y: auto; padding: 12px; } /* กินที่ที่เหลือ เลื่อนขึ้นลงได้ในตัว */
-.item {
+.item {  /* การ์ดสาขา 1 ใบ */
   display: block; /* การ์ดเป็น <button> ต้องบังคับเป็น block */
   width: 100%; /* เต็มความกว้าง */
   text-align: left; /* ปุ่มปกติจัดกลาง → ชิดซ้าย */
@@ -102,7 +102,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
   border-radius: 14px; /* มุมโค้ง */
   box-shadow: var(--shadow); /* เงานุ่ม */
   transition: border-color .15s, transform .15s; /* เปลี่ยนแบบนุ่มๆ */
-}
+}  /* จบ .item */
 .item:hover { transform: translateY(-1px); border-color: #ddd; } /* ชี้เมาส์ → ลอยขึ้นนิดหนึ่ง */
 .item.active { border-color: var(--accent); background: var(--accent-soft); } /* การ์ดที่เลือก → ขอบส้ม พื้นส้มอ่อน */
 .head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; } /* ชื่อซ้าย ระยะทางขวา */
@@ -126,7 +126,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
 .count small { display: block; font-size: 12px; } /* "บนจอตอนนี้ X" บรรทัดล่าง */
 
 /* หมุดสาขา (หยดน้ำ) */
-.pin span {
+.pin span {  /* ตัวหมุด */
   display: grid; /* ใช้ grid จัดอีโมจิกึ่งกลาง */
   place-items: center; /* กึ่งกลางทั้งแนวตั้งและนอน */
   width: 34px; /* กว้าง */
@@ -138,13 +138,13 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
   transform: rotate(-45deg); /* หมุนให้มุมแหลมชี้ลง */
   box-shadow: 0 2px 6px rgb(0 0 0 / .3); /* เงาให้ดูลอย */
   transition: transform .15s, background .15s; /* ขยาย / เปลี่ยนสีแบบนุ่ม */
-}
+}  /* จบ .pin span */
 .pin b { transform: rotate(45deg); font-weight: normal; line-height: 1; } /* หมุนอีโมจิกลับให้ตั้งตรง */
 .pin.on span, .pin:hover span { background: var(--accent); transform: rotate(-45deg) scale(1.15); } /* หมุดที่เลือก / ชี้ → พื้นส้ม ใหญ่ขึ้น 15% */
 
 /* ===== popup รายละเอียดสาขา ===== */
 .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 6px 24px rgb(0 0 0 / .18); } /* กรอบ popup: มุมโค้ง เงาเข้ม */
-.leaflet-popup-content {
+.leaflet-popup-content {  /* เนื้อหาใน popup */
   margin: 14px 10px 14px 16px; /* ระยะขอบใน (ขวาน้อยกว่า เผื่อแถบเลื่อน) */
   padding-right: 6px; /* เว้นที่ให้แถบเลื่อน */
   font: 14px/1.5 "Noto Sans Thai", system-ui, sans-serif; /* ฟอนต์ไทย (Leaflet ตั้งฟอนต์ของตัวเองไว้) */
@@ -152,7 +152,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
   overflow-y: auto; /* ยาวเกิน → เลื่อนในกล่อง */
   overscroll-behavior: contain; /* เลื่อนสุดแล้วไม่ไปเลื่อนแผนที่ต่อ */
   overflow-wrap: anywhere; /* คำยาวไม่มีช่องว่าง (ภาษาไทย / URL) ตัดขึ้นบรรทัดได้ */
-}
+}  /* จบ .leaflet-popup-content */
 .popup .name { font-size: 17px; } /* ชื่อสาขาใน popup ใหญ่กว่าในการ์ด */
 
 /* แถวสรุปแต่ละด้าน: ชื่อ | แถบ | ป้าย */
@@ -178,7 +178,7 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
 .links a + a { background: #f1f1f1; color: var(--text) !important; } /* ปุ่มที่สอง (Google Maps): เทา */
 
 /* ===== มือถือ (จอแคบกว่า 760px): แผนที่บน รายการล่าง ===== */
-@media (max-width: 760px) {
+@media (max-width: 760px) {  /* ใช้เมื่อจอแคบ */
   body { flex-direction: column-reverse; } /* สลับเป็นแนวตั้ง: แผนที่ขึ้นบน */
   #side { width: 100%; height: 58dvh; box-shadow: 0 -4px 16px rgb(0 0 0 / .1); } /* แถบรายการเต็มความกว้าง สูง 58% ของจอ */
   .brand { padding: 10px 14px; } /* แถบหัวบางลง */
@@ -189,4 +189,4 @@ h1 { font: 600 22px/1.3 var(--head); margin: 0; } /* ชื่อเว็บ: K
   .leaflet-popup-content { max-height: 26dvh; } /* แผนที่บนมือถือสูงแค่ ~42% ของจอ popup ต้องเตี้ยลง */
   .count { padding: 4px 10px; } /* ป้ายจำนวนเล็กลง */
   .count b { font-size: 18px; } /* ตัวเลขเล็กลง */
-}
+}  /* จบ @media */

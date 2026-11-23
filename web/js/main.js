@@ -11,7 +11,7 @@ let me = null; // ตำแหน่งผู้ใช้ { lat, lng } (null = �
 let active = null; // ลำดับสาขาที่เปิด popup อยู่
 
 // วาดรายการสาขาใหม่ แล้วคืนรายการที่เรียงแล้ว
-function render() {
+function render() {  // เรียกทุกครั้งที่ตำแหน่งผู้ใช้เปลี่ยน
   const rows = branches.map((b, i) => ({ b, i, d: me ? km(me, b) : null })); // ทุกสาขา + ระยะทางจากผู้ใช้ (ถ้ารู้ตำแหน่ง)
   const byDistance = (x, y) => x.d - y.d; // ใกล้ก่อน
   const byRating = (x, y) => (y.b.google_rating ?? 0) - (x.b.google_rating ?? 0); // ดาวมากก่อน (ไม่มีดาว = 0)
@@ -19,19 +19,19 @@ function render() {
   renderList(me ? rows.slice(0, NEAREST_COUNT) : rows, names); // รู้ตำแหน่ง → แสดงแค่ N สาขาใกล้สุด
   markActive(active); // คงไฮไลต์การ์ดที่เลือกไว้
   return rows; // ส่งกลับให้ setMe ใช้ต่อ
-}
+}  // จบ render
 
 // ตั้งตำแหน่งผู้ใช้ (จาก GPS หรือการค้นหา) แล้วอัปเดตรายการ + แผนที่
-function setMe(pos, label) {
+function setMe(pos, label) {  // pos = { lat, lng }, label = ข้อความบนหมุด
   me = pos; // จำตำแหน่ง
   const rows = render(); // เรียงรายการใหม่ตามระยะทาง
   if (!rows.length) return; // ไม่มีสาขาเลย → จบ
   showMe(me, label, rows.slice(0, 3).map(r => r.b)); // ปักจุดผู้ใช้ + ซูมให้เห็น 3 สาขาใกล้สุด
   setMsg(`${NEAREST_COUNT} สาขาที่ใกล้ที่สุด · ใกล้สุดห่าง ${rows[0].d.toFixed(1)} กม.`); // บอกผล
-}
+}  // จบ setMe
 
 // รันงานที่ต้องรอ (GPS / ค้นหา) โดยล็อกปุ่มไว้ กันกดซ้ำ (และกันยิง Nominatim ถี่เกิน)
-async function busy(btn, text, job) {
+async function busy(btn, text, job) {  // btn = ปุ่ม, text = ข้อความระหว่างรอ, job = งาน
   if (btn.disabled) return; // กำลังทำอยู่ → ไม่รับซ้ำ
   btn.disabled = true; // ล็อกปุ่ม
   setMsg(text); // บอกว่ากำลังทำอะไร
@@ -41,20 +41,20 @@ async function busy(btn, text, job) {
     setMsg(err.message || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง', true); // แสดงข้อความสีแดง
   } finally { // ไม่ว่าสำเร็จหรือไม่
     btn.disabled = false; // ปลดล็อกปุ่ม
-  }
-}
+  }  // จบ try/catch/finally
+}  // จบ busy
 
 // กดการ์ดในรายการ → ซูมไปที่สาขา + เปิด popup
 document.getElementById('list').onclick = e => { // ดักคลิกที่กล่องรายการทีเดียว (ไม่ต้องผูกทุกการ์ด)
   const el = e.target.closest('.item'); // หาการ์ดที่ถูกคลิก (คลิกโดนข้อความข้างในก็นับ)
   if (el) focus(branches[el.dataset.i], markers[el.dataset.i]); // เจอ → ไปที่สาขานั้น
-};
+};  // จบตัวดักคลิกรายการ
 
 // ปุ่ม "ใช้ตำแหน่งของฉัน"
 const geoBtn = document.getElementById('geo'); // ปุ่ม GPS
 geoBtn.onclick = () => busy(geoBtn, 'กำลังหาตำแหน่ง...', async () => { // กดแล้วล็อกปุ่มระหว่างรอ
   setMe(await myLocation(), 'คุณอยู่ที่นี่'); // ได้พิกัด → ตั้งเป็นตำแหน่งผู้ใช้
-});
+});  // จบงานปุ่ม GPS
 
 // ฟอร์มค้นหาที่อยู่
 const form = document.getElementById('search'); // ฟอร์มค้นหา
@@ -66,8 +66,8 @@ form.onsubmit = e => { // กด Enter หรือปุ่มค้นหา
   busy(form.querySelector('button'), 'กำลังค้นหา...', async () => { // ล็อกปุ่มค้นหาระหว่างรอ
     const hit = await geocode(q); // แปลงที่อยู่เป็นพิกัด
     setMe(hit, esc(hit.label)); // ตั้งเป็นตำแหน่งผู้ใช้ (escape ชื่อสถานที่ก่อนใส่ popup)
-  });
-};
+  });  // จบงานค้นหา
+};  // จบตัวดักส่งฟอร์ม
 
 // ---------- เริ่มทำงาน ----------
 initMap('map'); // สร้างแผนที่ใน <main id="map">
@@ -77,7 +77,7 @@ try { // โหลดข้อมูลสาขา
   for (const b of d.branches) { // ทำความสะอาดข้อความทุกสาขา
     b.name = clean(b.name); // ชื่อ: ตัดอักขระล่องหน
     b.address = clean(b.address); // ที่อยู่: ตัดอักขระล่องหน
-  }
+  }  // จบลูปทำความสะอาด
   const ov = overall(d.branches, Object.keys(names), d.settings?.min_mentions ?? 5); // สรุปภาพรวมทั้งเครือ (ไม่มี min_mentions → ใช้ 5)
   renderOverall(ov, names, d.branches.length); // วาดการ์ดภาพรวม
   document.getElementById('overall').open = matchMedia('(min-width: 761px)').matches; // จอใหญ่กางไว้, มือถือพับไว้ประหยัดที่
@@ -86,10 +86,10 @@ try { // โหลดข้อมูลสาขา
     b, // ข้อมูลสาขา
     () => popupHtml(b, names, me), // popup สร้างใหม่ทุกครั้งที่เปิด (ลิงก์นำทางใช้ตำแหน่งล่าสุด)
     () => markActive(active = i), // เปิด popup → จำสาขานี้ + ไฮไลต์การ์ด
-  ));
+  ));  // จบการสร้างหมุดทุกสาขา
   fitAll(); // ซูมให้เห็นทุกสาขา
   setMsg(`ทั้งหมด ${branches.length} สาขา · อัปเดต ${d.generated_at.slice(0, 10)}`); // บอกจำนวน + วันที่ของข้อมูล
   render(); // วาดรายการ (เรียงตามดาว)
 } catch { // โหลดไม่ได้ (ส่วนใหญ่เพราะเปิดไฟล์ตรงๆ แทน http server)
   setMsg('โหลดข้อมูลไม่ได้ (ต้องเปิดผ่าน http server ไม่ใช่ดับเบิลคลิกไฟล์)', true); // แจ้งเป็นสีแดง
-}
+}  // จบ try/catch โหลดข้อมูล
