@@ -1,0 +1,142 @@
+# =====================================================================
+# Predict_config.yml — ตั้งค่าทุกอย่างของ teenoi-predict (main.py อ่านไฟล์นี้)
+# =====================================================================
+
+seed: 42                         # ค่าสุ่มตั้งต้น (ไว้ทำให้ผลรันซ้ำได้เหมือนเดิม)
+log_level: INFO                  # ระดับ log: DEBUG ละเอียดสุด | INFO ปกติ | WARNING เฉพาะคำเตือน
+
+# --- เปิด/ปิดแต่ละขั้นของ pipeline (true = ทำ, false = ข้าม) ---
+steps:
+  find_branches: false           # ค้นหาสาขาด้วยชื่อบน Google Maps (ปิดไว้ ใช้ลิงก์ใน branches.extra_urls แทน)
+  scrape: true                   # ดึงรีวิวจาก Google Maps ลงฐานข้อมูล
+  predict: true                  # ให้โมเดลทำนาย sentiment แต่ละด้านของรีวิว
+  summarize: true                # สรุปผลรายสาขา รายด้าน
+  export: true                   # เขียนไฟล์ผลลัพธ์ (json/csv) ตามที่ระบุใน output
+
+# --- ตั้งค่า browser ที่ใช้เปิด Google Maps ---
+browser:
+  headless: true                 # true = ไม่แสดงหน้าต่าง browser, false = เห็นหน้าต่าง (ไว้ debug)
+  channel: chrome                # ใช้ Google Chrome ในเครื่อง (null = Chromium ของ Playwright ซึ่ง Google ไม่ให้ล็อกอิน)
+  profile_dir: gmaps_profile     # โฟลเดอร์เก็บ session ที่ล็อกอินไว้ (สร้างโดย python login.py)
+  locale: th-TH                  # ภาษาของหน้าเว็บ (ให้วันที่/ข้อความรีวิวออกมาเป็นไทย)
+
+# --- รายชื่อสาขาที่จะดึงรีวิว ---
+branches:
+  search_queries: []             # คำค้นหาสาขา ใช้เฉพาะตอน find_branches: true (เช่น "สุกี้ตี๋น้อย กรุงเทพ")
+  name_must_contain: "ตี๋น้อย"   # ผลค้นหาที่ชื่อไม่มีคำนี้จะถูกตัดทิ้ง (กันร้านอื่นหลุดมา)
+  extra_urls:                    # ลิงก์สาขาบรรทัดละสาขา (ลิงก์ค้นหาต้องเจอร้านเดียว ไม่งั้นสาขานั้นถูกข้าม)
+    # --- กรุงเทพฯ / ปริมณฑล (ชุดเพิ่ม) ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+มาร์เก็ต+Supreme"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางนา+มาร์เก็ต"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศิลามาร์เก็ต"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+2"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ออนติวานนท์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะไนน์+ติวานนท์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ราชพฤกษ์+ปั๊มคาลเท็กซ์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Fourth+พุทธมณฑลสาย+4"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศาลายา+วัน"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตลาดไทยสมบูรณ์+พระประแดง"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+บางบัวทอง"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พระราม+2+บางขุนเทียน"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Mingle+Mall+รังสิต"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โลตัส+คลอง+4"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+K-Space+ลำลูกกา+คลอง+6"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Urban+ศรีนครินทร์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ศรีนครินทร์+เทพารักษ์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Village+Hub+ราชพฤกษ์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Jas+Green+ประเวศ"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลำลูกกา+คลอง+2"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Terminal+21+พระราม+3"
+    # --- ปริมณฑล (สมุทรสาคร / สมุทรปราการ / นครปฐม) ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Porto+Chino+สมุทรสาคร"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Rainforest+กิ่งแก้ว"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Meet+and+Eat+นครปฐม"
+    # --- ใจกลางเมือง / รัชดา / พระราม 4 / อนุสาวรีย์ฯ ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+MBK+Center"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+I'm+Park+จุฬา"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+พระราม+4"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สวนเพลินมาร์เก็ต+ชั้น+4"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Victory+Hub"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะ+สตรีท+รัชดา"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัชดา+ซอย+18"
+    # --- ลาดพร้าว / พหลโยธิน / เกษตร-นวมินทร์ / บางกะปิ ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+19"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เลียบทางด่วน+1"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เกษตร-นวมินทร์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดพร้าว-วังหิน+59"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ตะวันนา+บางกะปิ"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+JC+Mall+นวมินทร์"
+    # --- รามอินทรา / สายไหม / มีนบุรี / ลาดกระบัง ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บ้านบางเขน"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รามอินทรา+23"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Alley+รามอินทรา+กม.9"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+คู้บอน"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลฯ-วัชรพล"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+สายไหม+อเวนิว"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+โอโซนวัน+สรงประภา"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+มีนบุรี+สุวินทวงศ์+3"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ลาดกระบัง+24/1"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เจ้าคุณวิลล่า"
+    # --- ฝั่งธนบุรี / เพชรเกษม / ปิ่นเกล้า / พระราม 2 ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+The+Sense+ปิ่นเกล้า"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ซีคอน+บางแค"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บิ๊กซี+เพชรเกษม"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เพชรเกษม+69/1"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะพาซิโอ+พาร์ค+กาญจนาภิเษก"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+ธนบุรี+มาร์เก็ตเพลส"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมโทร+ทาวน์+กัลปพฤกษ์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+Susco+พุทธบูชา"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+วิลเลจฮับ+ประชาอุทิศ+90"
+    # --- นนทบุรี / ปทุมธานี ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+รัตนาธิเบศร์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+บางใหญ่"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+พหลโยธิน+87"
+    # --- กรุงเทพฯ / นนทบุรี / ปทุมธานี (เพิ่มเติม) ---
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจ้งวัฒนะ"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+แจส+กรีน+วิลเลจ+รามคำแหง"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เอส+พาร์ค+คลองหลวง"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เดอะวอล์ค+เกษตร-นวมินทร์"
+    - "https://www.google.com/maps/search/?api=1&query=สุกี้ตี๋น้อย+เมเจอร์+อเวนิว+รัชโยธิน"
+  exclude_branch_ids: []         # branch_id ที่ไม่ต้องการ (ดู id ได้จาก branches.csv)
+  refresh_days: 30               # ค้นหาสาขาใหม่ทุกกี่วัน (ใช้ตอน find_branches: true)
+
+# --- การดึงรีวิว ---
+scraping:
+  max_reviews_first_run: 500     # ดึงได้มากสุดกี่รีวิวต่อสาขา (เป็นเพดานของทุกรอบ)
+  stop_older_than_months: 12     # หยุดเลื่อนเมื่อเจอรีวิวเก่ากว่านี้ (ควรเท่ากับ summary.recent_months, null = ดึงจนครบเพดาน)
+                                 # ponytail: รีวิวที่เก่ากว่านี้จะไม่ถูกดึงย้อนหลัง ถ้าอยากได้ทีหลัง ให้ตั้ง incremental: false + skip_if_scraped_within_days: 0 แล้วรันหนึ่งรอบ
+  incremental: false             # true = ข้ามรีวิวที่มีในฐานข้อมูลแล้ว (เร็ว), false = เลื่อนดูใหม่ทั้งหมด — รันเสร็จแล้วเปลี่ยนกลับเป็น true
+  max_branches_per_run: null     # ดึงกี่สาขาต่อรอบ (null = ทุกสาขา, ใส่ตัวเลขเพื่อแบ่งรอบ ลดความเสี่ยงบัญชีโดนจำกัด)
+  skip_if_scraped_within_days: 0 # ข้ามสาขาที่เพิ่งดึงไปภายในกี่วัน (0 = ดึงทุกสาขา) — รันเสร็จแล้วเปลี่ยนกลับเป็น 7
+  delay:                         # เวลาหน่วง (วินาที) สุ่มระหว่าง min-max ให้ดูเหมือนคนใช้งาน
+    scroll_min: 1.2              # หน่วงต่ำสุดระหว่างการเลื่อนโหลดรีวิว
+    scroll_max: 2.5              # หน่วงสูงสุดระหว่างการเลื่อนโหลดรีวิว
+    between_places_min: 1        # หน่วงต่ำสุดก่อนไปสาขาถัดไป  # ponytail: เดิม 4-8 วิ ถ้าเจอ "มุมมองแบบจำกัด" หรือได้ 0 รีวิวบ่อย ให้ปรับกลับ
+    between_places_max: 3        # หน่วงสูงสุดก่อนไปสาขาถัดไป
+
+# --- การทำความสะอาดข้อความรีวิว ---
+cleaning: {}                     # ว่าง = ใช้ DEFAULT_CLEANING ของ teenoi_data (แนะนำ ให้ตรงกับตอนเทรน) ใส่ key เพื่อทับเฉพาะค่านั้น
+
+# --- โมเดลที่ใช้ทำนาย ---
+model:
+  source: local                  # โหลดโมเดลจากไหน: local = โฟลเดอร์ในเครื่อง | hf_hub = Hugging Face Hub
+  local_path: model/best         # โฟลเดอร์โมเดล (ใช้ตอน source: local)
+  hf_repo_id: "<username>/teenoi-absa-xlmr"  # ชื่อ repo บน Hugging Face (ใช้ตอน source: hf_hub)
+  device: auto                   # auto = ใช้ GPU ถ้ามี | cuda = บังคับ GPU | cpu = บังคับ CPU
+  batch_size: 64                 # จำนวนคู่ (aspect, review) ต่อ batch (มากขึ้นเร็วขึ้น แต่ใช้หน่วยความจำมากขึ้น)
+  confidence_threshold: 0.6      # ผลที่โมเดลมั่นใจต่ำกว่านี้ไม่นับตอนสรุป
+
+# --- การสรุปผลรายสาขา ---
+summary:
+  recent_months: 12              # นับเฉพาะรีวิวล่าสุดกี่เดือน (null = ทั้งหมด)
+  min_mentions: 5                # ด้านไหนถูกพูดถึงน้อยกว่านี้ = "ข้อมูลไม่พอ"
+  positive_threshold: 0.3        # คะแนน >= ค่านี้ = "ดี" (คะแนน = (บวก - ลบ) / จำนวนที่พูดถึง)
+  negative_threshold: -0.3       # คะแนน <= ค่านี้ = "แย่" (อยู่ระหว่างสองค่า = "เฉยๆ")
+  sample_reviews_per_label: 3    # เก็บตัวอย่างรีวิวกี่อันต่อ positive/neutral/negative
+
+# --- ไฟล์ผลลัพธ์ ---
+output:
+  db_file: data/predict.db                                    # ฐานข้อมูล SQLite เก็บสาขา รีวิว ผลทำนาย ประวัติการรัน
+  review_predictions_file: data/output/review_predictions.csv # ผลทำนายรายรีวิว (1 แถว = 1 รีวิว)
+  branch_summary_file: data/output/branch_summary.json        # สรุปรายสาขา (ไฟล์หลักที่เว็บใช้)
+  branches_file: data/output/branches.csv                     # รายชื่อสาขาทั้งหมดในฐานข้อมูล
